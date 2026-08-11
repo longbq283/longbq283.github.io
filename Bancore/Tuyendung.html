@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Đánh giá Ứng viên AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 p-4 sm:p-8">
+
+    <!-- KHU VỰC FORM NHẬP THÔNG TIN ỨNG VIÊN -->
+    <div class="input-section p-6 sm:p-8 max-w-4xl mx-auto bg-white shadow-xl rounded-lg mb-10">
+        <h1 class="text-2xl font-bold text-blue-700 mb-6 border-b pb-2">NHẬP THÔNG TIN ỨNG VIÊN</h1>
+        
+        <form action="#" method="POST">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Họ và tên ứng viên</label>
+                    <input type="text" class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:border-blue-500" placeholder="Nhập họ tên...">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Vị trí ứng tuyển</label>
+                    <select class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:border-blue-500 bg-white">
+                        <option value="">-- Chọn vị trí tuyển dụng --</option>
+                        <option value="BA_QC_1_4">Chuyên viên phân tích nghiệp vụ và kiểm soát chất lượng BA/QC (cấp 1 đến cấp 4) - Nội bộ kết hợp ngoài hệ thống</option>
+                        <option value="BA_QC_CaoCap">Chuyên viên cấp cao phân tích nghiệp vụ và kiểm soát chất lượng cấp 1 - Ngoài hệ thống</option>
+                        <option value="QuanTri_Core">Chuyên viên Quản trị hệ thống ứng dụng Core Banking (từ cấp 1 đến cấp 3) - Ngoài hệ thống</option>
+                        <option value="QuanTri_DuLieu">Chuyên viên Quản trị dữ liệu (Cấp 1) - Nội bộ kết hợp ngoài hệ thống</option>
+                        <option value="DieuPhoi_DuAn">Chuyên viên Điều phối dự án (cấp 1) - Nội bộ kết hợp ngoài hệ thống</option>
+                        <option value="DamBao_ChatLuong">Chuyên viên Đảm bảo chất lượng (cấp 1) - Nội bộ kết hợp ngoài hệ thống</option>
+                        <option value="PhatTrien_UngDung">Chuyên viên phát triển ứng dụng (cấp 1) - Ngoài hệ thống</option>
+                        <option value="PhatTrien_API">Chuyên viên Phát triển API và Tích hợp (Cấp 1) - Ngoài hệ thống</option>
+                        <option value="PhatTrien_CoreBanking">Chuyên viên Phát triển Core Banking (cấp 1) - Ngoài hệ thống</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 font-semibold mb-2">Nội dung CV (Text)</label>
+                <textarea rows="6" class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:border-blue-500" placeholder="Dán toàn bộ text nội dung CV ứng viên vào đây..."></textarea>
+            </div>
+            
+            <button type="button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded">
+                Gửi AI Đánh giá
+            </button>
+        </form>
+    </div>
+
+    <!-- BÁO CÁO ĐÁNH GIÁ (Phần I) - Khu vực hiển thị kết quả -->
+    <div class="report-section p-6 sm:p-8 max-w-4xl mx-auto bg-white shadow-xl rounded-lg mb-10">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-700 mb-6 border-b pb-2">BÁO CÁO ĐÁNH GIÁ HỒ SƠ ỨNG VIÊN</h1>
+        
+        <h2 style="font-size: 1.25rem; font-weight: 600; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem;">1. Tổng quan</h2>
+        <p><strong>Họ và tên:</strong> [Tên ứng viên]</p>
+        <p><strong>Vị trí ứng tuyển:</strong> [Vị trí đã chọn]</p>
+        <p><strong>Điểm trung bình:</strong> [Điểm TB]</p>
+        <p><strong>Kết quả:</strong> [Kết quả: Đạt/Không đạt/Cân nhắc]</p>
+
+        <h2 style="font-size: 1.25rem; font-weight: 600; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem; margin-top: 2rem;">2. Phân tích chi tiết</h2>
+        <ul style="list-style: none; padding: 0;">
+            <!-- Cấu trúc mẫu cho 1 tiêu chí -->
+            <li style="margin-bottom: 1.25rem;">
+                <strong>Mô tả công việc (Điểm: X/10)</strong>
+                <ul style="list-style-type: none; padding-left: 1.25rem; margin-top: 0.5rem;">
+                    <li style="margin-bottom: 0.25rem;"><strong style="color: #4b5563;">Yêu cầu:</strong> [Nội dung yêu cầu]</li>
+                    <li style="margin-bottom: 0.25rem;"><strong style="color: #4b5563;">Thông tin ứng viên:</strong> [Trích xuất CV]</li>
+                    <li style="margin-bottom: 0.25rem;"><strong style="color: #4b5563;">Nhận xét:</strong> [Nhận xét AI]</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h2 style="font-size: 1.25rem; font-weight: 600; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem; margin-top: 2rem;">3. Đánh giá sự phù hợp về kinh nghiệm với mô tả công việc</h2>
+        <p>[Nội dung phân tích của AI...]</p>
+
+        <h2 style="font-size: 1.25rem; font-weight: 600; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem; margin-top: 2rem;">4. Điểm mạnh</h2>
+        <p>[Liệt kê điểm mạnh...]</p>
+
+        <h2 style="font-size: 1.25rem; font-weight: 600; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem; margin-top: 2rem;">5. Điểm cần cải thiện</h2>
+        <p>[Liệt kê điểm yếu...]</p>
+
+        <h2 style="font-size: 1.25rem; font-weight: 600; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem; margin-top: 2rem;">6. Kết luận và Đề xuất</h2>
+        <p>[Đề xuất tuyển dụng...]</p>
+
+        <h2 style="font-size: 1.25rem; font-weight: 600; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem; margin-top: 2rem;">7. Phụ lục</h2>
+        <h3 style="font-size: 1.1rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem;">7.1. Tóm tắt quá trình công tác</h3>
+        <p>[Tóm tắt CV...]</p>
+        <h3 style="font-size: 1.1rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem;">7.2. Học vấn (Bằng cấp, chứng chỉ)</h3>
+        <p>[Thông tin học vấn...]</p>
+    </div>
+  
+    <!-- BỘ CÂU HỎI PHỎNG VẤN (Phần II) -->
+    <div class="questions-section p-6 sm:p-8 max-w-4xl mx-auto bg-white shadow-xl rounded-lg">
+        <h1 class="text-2xl sm:text-3xl font-bold mt-4 mb-6 border-b pb-2 text-gray-700">BỘ CÂU HỎI PHỎNG VẤN GỢI Ý</h1>
+        
+        <h3 style="font-size: 1.1rem; font-weight: 600; margin-top: 1rem; margin-bottom: 1rem;">Câu hỏi Hành vi/Kỹ thuật/Tình huống</h3>
+        
+        <!-- Cấu trúc mẫu cho 1 Câu hỏi -->
+        <div class="p-4 mb-6 border border-gray-200 rounded-lg">
+            <p class="mb-2"><strong class="text-blue-600">Câu hỏi 1:</strong> [Nội dung câu hỏi]</p>
+            <div class="bg-green-50 p-3 rounded-md mb-2">
+                <strong class="text-green-700">Gợi ý Trả lời:</strong> <br>
+                [Các điểm chính/phạm vi câu trả lời chấp nhận được...]
+            </div>
+            <div class="bg-yellow-50 p-3 rounded-md">
+                <strong class="text-yellow-700">Thang điểm (1-10):</strong> <br>
+                [Gợi ý chi tiết về cách chấm điểm...]
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
