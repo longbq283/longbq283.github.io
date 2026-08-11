@@ -437,9 +437,9 @@ PHẦN II: BỘ CÂU HỎI PHỎNG VẤN GỢI Ý (BẮT BUỘC TỐI THIỂU 5 
 </div>
 `;
 
-            try {
-                // ĐÃ SỬA URL THÀNH MODEL MỚI NHẤT LÀ gemini-2.0-flash
-                let url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`;
+try {
+                // ĐÃ ĐỔI TÊN MÔ HÌNH SANG gemini-pro (phiên bản ổn định)
+                let url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent`;
                 let headers = { 'Content-Type': 'application/json' };
 
                 if (apiKey.startsWith('AIzaSy')) {
@@ -476,7 +476,8 @@ PHẦN II: BỘ CÂU HỎI PHỎNG VẤN GỢI Ý (BẮT BUỘC TỐI THIỂU 5 
 
             } catch (error) {
                 console.error(error);
-                alert("Lỗi kết nối Gemini AI:\n" + error.message + "\n\nVui lòng kiểm tra lại xem API Key có bắt đầu bằng chữ 'AIzaSy...' không nhé!");
+                // ĐÃ XÓA CÂU CẢNH BÁO GÂY HIỂU LẦM VỀ API KEY AIZASY...
+                alert("Hệ thống báo lỗi:\n" + error.message);
                 btn.innerHTML = '<i class="fas fa-magic mr-2"></i> Thử Đánh giá lại';
                 btn.classList.replace('bg-gray-500', 'bg-purple-600');
             } finally {
