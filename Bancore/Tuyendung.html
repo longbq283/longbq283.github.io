@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trình Quản lý Hồ sơ Ứng viên AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome cho các icon -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
@@ -20,10 +19,10 @@
     <!-- Header -->
     <header class="bg-white shadow-sm mb-8 text-center py-8">
         <h1 class="text-3xl font-bold text-gray-800 mb-2">Trình Quản lý Hồ sơ Ứng viên</h1>
-        <p class="text-gray-500">Hệ thống hỗ trợ review và báo cáo kết quả tuyển dụng tích hợp AI</p>
+        <p class="text-gray-500">Công cụ hỗ trợ review và báo cáo kết quả tuyển dụng tích hợp AI</p>
     </header>
 
-    <div class="max-w-6xl mx-auto px-4 pb-12">
+    <div class="max-w-5xl mx-auto px-4 pb-12">
         
         <!-- Tabs Điều hướng -->
         <div class="flex border-b border-gray-200 mb-6 justify-center">
@@ -38,204 +37,215 @@
         <!-- TAB 1: QUẢN LÝ TIÊU CHÍ (JD) -->
         <div id="jd-tab" class="bg-white rounded-lg shadow-md p-6 sm:p-8 block">
             <div class="flex justify-between items-center mb-6 border-b pb-4">
-                <h2 class="text-xl font-bold text-gray-700">Thiết lập Tiêu chí Tuyển dụng (JD)</h2>
-                <button class="bg-green-100 text-green-700 px-4 py-2 rounded-md hover:bg-green-200 transition text-sm font-semibold">
-                    <i class="fas fa-plus mr-1"></i> Thêm Vị trí Mới
+                <h2 class="text-xl font-bold text-gray-700">Thiết lập Tiêu chí Tuyển dụng</h2>
+                <button class="bg-green-50 text-green-700 px-4 py-2 rounded-md hover:bg-green-100 transition border border-green-200 text-sm font-semibold">
+                    <i class="fas fa-plus mr-1"></i> Thêm Vị trí
                 </button>
             </div>
 
-            <div class="mb-4">
-                <label class="block text-gray-700 font-semibold mb-2">Chọn vị trí để chỉnh sửa:</label>
-                <select class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50">
-                    <option>Chuyên viên phân tích nghiệp vụ và kiểm soát chất lượng BA/QC</option>
-                    <option>Chuyên viên Quản trị hệ thống ứng dụng Core Banking</option>
-                    <option>Chuyên viên Điều phối dự án</option>
+            <div class="mb-6">
+                <label class="block text-gray-700 font-semibold mb-2">Chọn vị trí để cấu hình:</label>
+                <select class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:border-blue-500 bg-gray-50">
+                    <option>Chuyên viên Phân tích Nghiệp vụ (BA) - Core Banking</option>
+                    <option>Chuyên viên Quản trị hệ thống ứng dụng</option>
+                    <option>Chuyên viên Phát triển API và Tích hợp</option>
                 </select>
             </div>
 
-            <div class="grid grid-cols-1 gap-6">
+            <div class="space-y-4 border border-gray-200 rounded-lg p-5 bg-gray-50">
                 <div>
-                    <label class="block text-gray-700 text-sm font-semibold mb-2">Mô tả công việc</label>
-                    <textarea rows="4" class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm text-gray-600">1. Công tác Phân tích nghiệp vụ (BA): Thực hiện thu thập và phân tích yêu cầu nghiệp vụ liên quan đến hệ thống Core Banking...
-2. Công tác kiểm soát chất lượng (QC)...</textarea>
+                    <label class="block text-gray-700 text-sm font-semibold mb-1">Mô tả công việc</label>
+                    <textarea rows="4" class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:border-blue-500 text-sm">Thực hiện thu thập và phân tích yêu cầu nghiệp vụ liên quan đến hệ thống Core Banking và các hệ thống vệ tinh. Tư vấn giải pháp phát triển mới, tư vấn thiết kế chức năng hệ thống, truyền tải yêu cầu nghiệp vụ thành các thông số kỹ thuật hệ thống.</textarea>
                 </div>
                 <div>
-                    <label class="block text-gray-700 text-sm font-semibold mb-2">Yêu cầu độ tuổi</label>
-                    <textarea rows="2" class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm text-gray-600">dưới 35 tuổi tại thời điểm dự tuyển.</textarea>
-                </div>
-                <div>
-                    <label class="block text-gray-700 text-sm font-semibold mb-2">Trình độ chuyên môn & Kinh nghiệm</label>
-                    <textarea rows="4" class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm text-gray-600">Tốt nghiệp các trường đại học hệ chính quy... Tối thiểu 01 năm kinh nghiệm làm BA hệ thống.</textarea>
+                    <label class="block text-gray-700 text-sm font-semibold mb-1">Kinh nghiệm công tác</label>
+                    <textarea rows="3" class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:border-blue-500 text-sm">Có kinh nghiệm làm vị trí Phân tích nghiệp vụ hệ thống. Có kiến thức về các sản phẩm, quy trình ngân hàng, hiểu biết về kiến trúc hệ thống và tích hợp. Ưu tiên kinh nghiệm làm việc theo quy trình Agile/Scrum.</textarea>
                 </div>
             </div>
             
             <div class="mt-6 flex justify-end">
                 <button class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition font-semibold">
-                    <i class="fas fa-save mr-2"></i>Lưu Tiêu Chí
+                    Lưu Tiêu Chí
                 </button>
             </div>
         </div>
 
         <!-- TAB 2: THÊM ỨNG VIÊN & ĐÁNH GIÁ -->
         <div id="candidate-tab" class="bg-white rounded-lg shadow-md p-6 sm:p-8 hidden">
-            <h2 class="text-xl font-bold text-gray-700 mb-6 border-b pb-4">Thông tin Cơ bản</h2>
+            <h2 class="text-xl font-bold text-gray-700 mb-6 border-b pb-4">Thông tin Ứng viên</h2>
             
             <form action="#" method="POST">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
                         <label class="block text-gray-700 text-sm font-semibold mb-2">Họ và Tên</label>
-                        <input type="text" class="w-full border border-gray-300 rounded-md p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nguyễn Văn A">
+                        <input type="text" class="w-full border border-gray-300 rounded-md p-2.5 focus:outline-none focus:border-blue-500" placeholder="Nguyễn Văn A">
                     </div>
                     <div>
                         <label class="block text-gray-700 text-sm font-semibold mb-2">Vị trí ứng tuyển</label>
-                        <select class="w-full border border-gray-300 rounded-md p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-                            <option>Chuyên viên phân tích nghiệp vụ và kiểm soát chất lượng BA/QC</option>
-                            <option>Chuyên viên Quản trị hệ thống ứng dụng Core Banking</option>
+                        <select class="w-full border border-gray-300 rounded-md p-2.5 focus:outline-none focus:border-blue-500 bg-white">
+                            <option>Chuyên viên Phân tích Nghiệp vụ (BA) - Core Banking</option>
                         </select>
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 text-sm font-semibold mb-2">Email</label>
-                        <input type="email" class="w-full border border-gray-300 rounded-md p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="email@example.com">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 text-sm font-semibold mb-2">Số điện thoại</label>
-                        <input type="text" class="w-full border border-gray-300 rounded-md p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="090...">
                     </div>
                 </div>
 
                 <div class="bg-blue-50 p-6 rounded-lg border border-blue-100 mb-8">
                     <h3 class="text-lg font-bold text-blue-800 mb-4"><i class="fas fa-robot mr-2"></i>Đánh giá bằng AI</h3>
                     
-                    <!-- UPLOAD FILE NÂNG CẤP -->
+                    <!-- UPLOAD FILE CV -->
                     <div class="mb-4">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Tải file CV lên (PDF, DOCX, JPG, PNG)</label>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Tải file CV lên (PDF, DOC, DOCX, JPG, PNG)</label>
                         <div class="flex items-center justify-center w-full">
-                            <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-white border-gray-300 hover:bg-gray-50">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-white border-blue-300 hover:bg-blue-50 transition">
                                 <div class="flex flex-col items-center justify-center pt-5 pb-6 text-gray-500">
-                                    <i class="fas fa-cloud-upload-alt text-3xl mb-2"></i>
-                                    <p class="mb-1 text-sm"><span class="font-semibold">Click để chọn file</span> hoặc kéo thả vào đây</p>
-                                    <p class="text-xs">Hỗ trợ nhận diện chữ từ ảnh (OCR)</p>
+                                    <i class="fas fa-cloud-upload-alt text-3xl mb-2 text-blue-500"></i>
+                                    <p class="mb-1 text-sm"><span class="font-semibold text-blue-600">Click để chọn file</span> hoặc kéo thả vào đây</p>
+                                    <p class="text-xs text-gray-400">AI tự động nhận dạng và đọc chữ từ ảnh/file</p>
                                 </div>
-                                <input id="dropzone-file" type="file" class="hidden" accept=".pdf,.doc,.docx,.jpg,.png" multiple />
+                                <input type="file" class="hidden" accept=".pdf,.doc,.docx,.jpg,.png" />
                             </label>
                         </div>
                     </div>
 
                     <button type="button" onclick="showResults()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-md transition shadow-md">
-                        <i class="fas fa-magic mr-2"></i> Bắt đầu Đánh giá Báo cáo
+                        <i class="fas fa-magic mr-2"></i> Trích xuất & Đánh giá Hồ sơ
                     </button>
                 </div>
             </form>
 
-            <!-- KẾT QUẢ ĐÁNH GIÁ (Ẩn đi, chỉ hiện khi bấm nút) -->
+            <!-- KẾT QUẢ ĐÁNH GIÁ (Mô phỏng Output chuẩn form AI yêu cầu) -->
             <div id="ai-results" class="hidden mt-10 border-t pt-8">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-gray-800">Báo cáo Đánh giá Chi tiết</h2>
-                    <div class="text-lg font-bold px-4 py-2 bg-green-100 text-green-800 rounded-lg border border-green-200">
-                        Kết quả: ĐẠT (8.5/10)
-                    </div>
-                </div>
-
-                <!-- 5 CÂU HỎI PHỎNG VẤN CHUYÊN SÂU -->
-                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm mb-8 relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-6"><i class="fas fa-comments text-blue-500 mr-2"></i>Bộ 5 Câu Hỏi Phỏng Vấn Gợi Ý Theo Hệ Thống AI</h3>
+                
+                <!-- BÁO CÁO ĐÁNH GIÁ ỨNG VIÊN (Phần I) -->
+                <div class="report-section mb-10">
+                    <h1 class="text-2xl font-bold text-gray-700 mb-6 border-b pb-2">BÁO CÁO ĐÁNH GIÁ HỒ SƠ ỨNG VIÊN</h1>
                     
-                    <div class="space-y-6">
-                        <!-- Câu 1 -->
-                        <div class="p-4 bg-gray-50 rounded-lg border border-gray-100">
-                            <p class="font-semibold text-gray-800 mb-2"><span class="text-blue-600">Câu 1 (Hành vi/Kinh nghiệm):</span> Dựa vào CV, bạn đã có kinh nghiệm làm dự án Core Banking. Bạn có thể chia sẻ một thách thức lớn nhất khi tích hợp các hệ thống vệ tinh vào Core Banking và cách bạn xử lý nó không?</p>
-                            <div class="bg-green-50 p-3 rounded text-sm text-green-800 mb-2 border border-green-100">
-                                <strong>Gợi ý Trả lời:</strong> Ứng viên cần nêu rõ được luồng dữ liệu, cách quản lý rủi ro downtime, và kỹ năng phối hợp giữa team Dev và Test (UAT/SIT).
-                            </div>
-                            <div class="bg-yellow-50 p-3 rounded text-sm text-yellow-800 border border-yellow-100">
-                                <strong>Thang điểm (8-10):</strong> Phân tích được tác động hệ thống, sử dụng tool (Jira/Confluence) để tracking lỗi minh bạch.
-                            </div>
-                        </div>
+                    <h2 style="font-size: 1.25rem; font-weight: 600; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem;">1. Tổng quan</h2>
+                    <p><strong>Họ và tên:</strong> Nguyễn Văn A</p>
+                    <p><strong>Vị trí ứng tuyển:</strong> Chuyên viên Phân tích Nghiệp vụ (BA) - Core Banking</p>
+                    <p><strong>Điểm trung bình:</strong> 8.2</p>
+                    <p><strong>Kết quả:</strong> Đạt</p>
 
-                        <!-- Câu 2 -->
-                        <div class="p-4 bg-gray-50 rounded-lg border border-gray-100">
-                            <p class="font-semibold text-gray-800 mb-2"><span class="text-blue-600">Câu 2 (Kỹ thuật/Nghiệp vụ):</span> JD yêu cầu khả năng phân tích hệ thống (chứ không chỉ app). Theo bạn, sự khác biệt mấu chốt khi viết URD/RSD cho một hệ thống back-end so với một ứng dụng front-end là gì?</p>
-                            <div class="bg-green-50 p-3 rounded text-sm text-green-800 mb-2 border border-green-100">
-                                <strong>Gợi ý Trả lời:</strong> Nhấn mạnh vào cấu trúc dữ liệu, tham số hệ thống, logic xử lý, API và bảo mật thay vì chỉ UI/UX.
-                            </div>
-                            <div class="bg-yellow-50 p-3 rounded text-sm text-yellow-800 border border-yellow-100">
-                                <strong>Thang điểm (8-10):</strong> Đưa ra được ví dụ thực tế về bảng database hoặc tham số cấu hình hệ thống.
-                            </div>
-                        </div>
+                    <h2 style="font-size: 1.25rem; font-weight: 600; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem; margin-top: 1.5rem;">2. Phân tích chi tiết</h2>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 1.25rem;">
+                            <strong>Kinh nghiệm công tác (Điểm: 8/10)</strong>
+                            <ul style="list-style-type: none; padding-left: 1.25rem; margin-top: 0.5rem;">
+                                <li style="margin-bottom: 0.25rem;"><strong style="color: #4b5563;">Yêu cầu:</strong> Có kinh nghiệm làm vị trí Phân tích nghiệp vụ hệ thống. Có kiến thức về các sản phẩm, quy trình ngân hàng...</li>
+                                <li style="margin-bottom: 0.25rem;"><strong style="color: #4b5563;">Thông tin ứng viên:</strong> 2 năm kinh nghiệm BA, tham gia dự án nâng cấp hệ thống định danh khách hàng, khảo sát user và viết tài liệu URD/RSD.</li>
+                                <li style="margin-bottom: 0.25rem;"><strong style="color: #4b5563;">Nhận xét:</strong> Đáp ứng tốt yêu cầu kinh nghiệm phân tích hệ thống. Có hiểu biết về quy trình tích hợp các hệ thống đích nhưng chưa thể hiện rõ kinh nghiệm chuyên sâu về Core Banking.</li>
+                            </ul>
+                        </li>
+                    </ul>
 
-                        <!-- Câu 3 -->
-                        <div class="p-4 bg-gray-50 rounded-lg border border-gray-100">
-                            <p class="font-semibold text-gray-800 mb-2"><span class="text-blue-600">Câu 3 (Kỹ năng mềm):</span> Trong quá trình UAT, nếu User yêu cầu thay đổi luồng nghiệp vụ đi ngược lại thiết kế kỹ thuật ban đầu, bạn sẽ xử lý thế nào với vai trò BA?</p>
-                            <div class="bg-green-50 p-3 rounded text-sm text-green-800 mb-2 border border-green-100">
-                                <strong>Gợi ý Trả lời:</strong> Đánh giá impact (thời gian, chi phí, rủi ro), tổ chức họp các bên, đề xuất work-around hoặc đưa vào phase sau (Change Request).
-                            </div>
-                            <div class="bg-yellow-50 p-3 rounded text-sm text-yellow-800 border border-yellow-100">
-                                <strong>Thang điểm (8-10):</strong> Thể hiện tư duy phản biện, kỹ năng đàm phán và hiểu biết về quy trình Agile/Scrum.
-                            </div>
-                        </div>
+                    <h2 style="font-size: 1.25rem; font-weight: 600; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem; margin-top: 1.5rem;">3. Đánh giá sự phù hợp về kinh nghiệm với mô tả công việc</h2>
+                    <p>Ứng viên có tư duy phân tích hệ thống tốt, quen thuộc với các tài liệu đặc tả yêu cầu kỹ thuật (URD, RSD). Phù hợp với công việc chuyển đổi yêu cầu nghiệp vụ thành luồng thiết kế hệ thống.</p>
 
-                        <!-- Câu 4 -->
-                        <div class="p-4 bg-gray-50 rounded-lg border border-gray-100">
-                            <p class="font-semibold text-gray-800 mb-2"><span class="text-blue-600">Câu 4 (Tình huống):</span> CV của bạn chưa thấy đề cập nhiều về việc sử dụng AI trong công việc (theo yêu cầu JD). Bạn có sẵn sàng học hỏi và đã từng tìm hiểu tool AI nào hỗ trợ viết spec chưa?</p>
-                            <div class="bg-green-50 p-3 rounded text-sm text-green-800 mb-2 border border-green-100">
-                                <strong>Gợi ý Trả lời:</strong> Kể tên được các tool như ChatGPT, Claude hỗ trợ sinh use case, hoặc tool draw.io để vẽ flow. Thể hiện tinh thần sẵn sàng học hỏi.
-                            </div>
-                            <div class="bg-yellow-50 p-3 rounded text-sm text-yellow-800 border border-yellow-100">
-                                <strong>Thang điểm (8-10):</strong> Có tư duy ứng dụng tự động hóa vào quy trình làm việc để tăng năng suất.
-                            </div>
-                        </div>
+                    <h2 style="font-size: 1.25rem; font-weight: 600; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem; margin-top: 1.5rem;">4. Điểm mạnh</h2>
+                    <p>Nắm vững quy trình UAT, SIT. Thành thạo công cụ vẽ luồng nghiệp vụ và quản lý dự án.</p>
 
-                        <!-- Câu 5 -->
-                        <div class="p-4 bg-gray-50 rounded-lg border border-gray-100">
-                            <p class="font-semibold text-gray-800 mb-2"><span class="text-blue-600">Câu 5 (Làm rõ điểm yếu):</span> Chứng chỉ ngoại ngữ của bạn hiện tại mới đạt IELTS 5.0 (Yêu cầu 5.5). Bạn dự định sẽ bổ sung theo quy định trong 24 tháng tới bằng kế hoạch như thế nào?</p>
-                            <div class="bg-green-50 p-3 rounded text-sm text-green-800 mb-2 border border-green-100">
-                                <strong>Gợi ý Trả lời:</strong> Đưa ra được lộ trình rõ ràng, tính kỷ luật trong việc học tập kết hợp công việc.
-                            </div>
-                            <div class="bg-yellow-50 p-3 rounded text-sm text-yellow-800 border border-yellow-100">
-                                <strong>Thang điểm (8-10):</strong> Cam kết mạnh mẽ, có kế hoạch khả thi và thái độ cầu tiến.
-                            </div>
+                    <h2 style="font-size: 1.25rem; font-weight: 600; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem; margin-top: 1.5rem;">5. Điểm cần cải thiện</h2>
+                    <p>Chưa có chứng chỉ ngoại ngữ theo yêu cầu. Kiến thức về sản phẩm Core Banking chuyên sâu (như kế toán ngân hàng, thanh toán quốc tế) chưa được làm nổi bật.</p>
+
+                    <h2 style="font-size: 1.25rem; font-weight: 600; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem; margin-top: 1.5rem;">6. Kết luận và Đề xuất</h2>
+                    <p>Mời phỏng vấn. Cần kiểm tra thêm tư duy logic hệ thống và khả năng ngoại ngữ.</p>
+
+                    <h2 style="font-size: 1.25rem; font-weight: 600; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem; margin-top: 1.5rem;">7. Phụ lục</h2>
+                    <h3 style="font-size: 1.1rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem;">7.1. Tóm tắt quá trình công tác</h3>
+                    <p>2024-nay: Business Analyst tại Công ty XYZ, phụ trách dự án hệ thống IAM.</p>
+                    <h3 style="font-size: 1.1rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem;">7.2. Học vấn (Bằng cấp, chứng chỉ)</h3>
+                    <p>Cử nhân Hệ thống Thông tin Quản lý - Đại học Kinh tế Quốc dân.</p>
+                </div>
+
+                <!-- BỘ CÂU HỎI PHỎNG VẤN (Phần II) -->
+                <div class="questions-section">
+                    <h1 class="text-2xl font-bold mt-10 mb-6 border-b pb-2 text-gray-700">BỘ CÂU HỎI PHỎNG VẤN GỢI Ý</h1>
+                    <h3 style="font-size: 1.1rem; font-weight: 600; margin-top: 1rem; margin-bottom: 1rem;">Câu hỏi Hành vi/Kỹ thuật/Tình huống</h3>
+
+                    <div class="p-4 mb-6 border border-gray-200 rounded-lg bg-white">
+                        <p class="mb-2"><strong class="text-blue-600">Câu hỏi 1:</strong> Bạn có kinh nghiệm viết URD/RSD. Theo bạn, khi phân tích yêu cầu cho một hệ thống backend phức tạp, đâu là điểm khác biệt lớn nhất so với phân tích một giao diện người dùng đơn thuần?</p>
+                        <div class="bg-green-50 p-3 rounded-md mb-2 border border-green-100">
+                            <strong class="text-green-700">Gợi ý Trả lời:</strong> Ứng viên cần đề cập đến việc phân tích luồng dữ liệu, tham số cấu hình, xử lý giao dịch đồng thời, các ràng buộc API và logic nghiệp vụ ngầm thay vì chỉ tập trung vào UI/UX.
+                        </div>
+                        <div class="bg-yellow-50 p-3 rounded-md border border-yellow-100">
+                            <strong class="text-yellow-700">Thang điểm (1-10):</strong> 8-10 điểm nếu nêu bật được tầm quan trọng của việc hiểu kiến trúc dữ liệu và khả năng tích hợp giữa các hệ thống vệ tinh.
+                        </div>
+                    </div>
+
+                    <div class="p-4 mb-6 border border-gray-200 rounded-lg bg-white">
+                        <p class="mb-2"><strong class="text-blue-600">Câu hỏi 2:</strong> Trong quá trình thực hiện test UAT, nếu người dùng nghiệp vụ (Business User) phát hiện hệ thống hoạt động đúng thiết kế nhưng không đúng với kỳ vọng thực tế của họ, bạn sẽ xử lý tình huống này thế nào?</p>
+                        <div class="bg-green-50 p-3 rounded-md mb-2 border border-green-100">
+                            <strong class="text-green-700">Gợi ý Trả lời:</strong> Đánh giá mức độ ảnh hưởng của thay đổi (impact analysis), thảo luận lại với team Dev và User, đề xuất đưa vào phase sau (Change Request) nếu rủi ro dự án cao.
+                        </div>
+                        <div class="bg-yellow-50 p-3 rounded-md border border-yellow-100">
+                            <strong class="text-yellow-700">Thang điểm (1-10):</strong> 7-9 điểm cho kỹ năng đàm phán, quản lý kỳ vọng và hiểu biết về quy trình phát triển dự án.
+                        </div>
+                    </div>
+
+                    <div class="p-4 mb-6 border border-gray-200 rounded-lg bg-white">
+                        <p class="mb-2"><strong class="text-blue-600">Câu hỏi 3:</strong> JD có đề cập đến kỹ năng sử dụng AI trong công việc. Bạn thường ứng dụng các công cụ AI nào để hỗ trợ quá trình phân tích và viết tài liệu hệ thống?</p>
+                        <div class="bg-green-50 p-3 rounded-md mb-2 border border-green-100">
+                            <strong class="text-green-700">Gợi ý Trả lời:</strong> Sử dụng các mô hình ngôn ngữ (như ChatGPT Plus/Edu) để brainstorm luồng nghiệp vụ, dịch tài liệu kỹ thuật, hoặc tối ưu hóa wording trong đặc tả.
+                        </div>
+                        <div class="bg-yellow-50 p-3 rounded-md border border-yellow-100">
+                            <strong class="text-yellow-700">Thang điểm (1-10):</strong> 8-10 điểm nếu ứng viên thể hiện tư duy áp dụng công nghệ mới để tăng năng suất làm việc nhóm.
+                        </div>
+                    </div>
+
+                    <div class="p-4 mb-6 border border-gray-200 rounded-lg bg-white">
+                        <p class="mb-2"><strong class="text-blue-600">Câu hỏi 4:</strong> Khi một hệ thống vệ tinh cần kết nối lấy dữ liệu từ Core Banking nhưng bị trễ (timeout), đứng ở góc độ BA, bạn sẽ cần yêu cầu bổ sung các tham số cấu hình hay cơ chế nào để giải quyết?</p>
+                        <div class="bg-green-50 p-3 rounded-md mb-2 border border-green-100">
+                            <strong class="text-green-700">Gợi ý Trả lời:</strong> Đề cập đến các cơ chế xử lý bất đồng bộ, hàng đợi (queue), cơ chế retry (thử lại), hoặc tối ưu hóa query cơ sở dữ liệu.
+                        </div>
+                        <div class="bg-yellow-50 p-3 rounded-md border border-yellow-100">
+                            <strong class="text-yellow-700">Thang điểm (1-10):</strong> 9-10 điểm cho tư duy kỹ thuật hệ thống sâu sắc và kinh nghiệm xử lý lỗi kết nối tích hợp.
+                        </div>
+                    </div>
+
+                    <div class="p-4 mb-6 border border-gray-200 rounded-lg bg-white">
+                        <p class="mb-2"><strong class="text-blue-600">Câu hỏi 5:</strong> Hồ sơ của bạn hiện chưa cập nhật chứng chỉ Tiếng Anh tương đương IELTS 5.5. Nếu trúng tuyển, kế hoạch hoàn thiện chứng chỉ này trong 24 tháng tới của bạn là gì để đảm bảo khả năng đọc hiểu tài liệu chuyên ngành?</p>
+                        <div class="bg-green-50 p-3 rounded-md mb-2 border border-green-100">
+                            <strong class="text-green-700">Gợi ý Trả lời:</strong> Đưa ra lộ trình học tập thực tế, có mục tiêu rõ ràng và cam kết tuân thủ quy định tuyển dụng của ngân hàng.
+                        </div>
+                        <div class="bg-yellow-50 p-3 rounded-md border border-yellow-100">
+                            <strong class="text-yellow-700">Thang điểm (1-10):</strong> 7-9 điểm đánh giá mức độ trung thực, kỷ luật cá nhân và khả năng giao tiếp hiện tại.
                         </div>
                     </div>
                 </div>
 
-                <div class="flex justify-end gap-3">
+                <div class="flex justify-end gap-3 mt-4">
                     <button class="bg-gray-200 text-gray-700 px-4 py-2 rounded font-semibold hover:bg-gray-300 transition">Hủy</button>
-                    <button class="bg-blue-600 text-white px-6 py-2 rounded font-semibold hover:bg-blue-700 transition"><i class="fas fa-file-word mr-2"></i>Xuất Word Báo Cáo</button>
+                    <button class="bg-blue-600 text-white px-6 py-2 rounded font-semibold hover:bg-blue-700 transition">
+                        <i class="fas fa-download mr-2"></i>Xuất File Báo Cáo
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Script điều khiển giao diện -->
     <script>
         function switchTab(tabId) {
-            // Ẩn tất cả nội dung
             document.getElementById('jd-tab').classList.add('hidden');
             document.getElementById('candidate-tab').classList.add('hidden');
             
-            // Reset trạng thái nút
             document.getElementById('btn-jd-tab').className = "tab-inactive px-6 py-3 transition-colors duration-200 focus:outline-none";
             document.getElementById('btn-candidate-tab').className = "tab-inactive px-6 py-3 transition-colors duration-200 focus:outline-none";
             
-            // Hiển thị tab được chọn
             document.getElementById(tabId).classList.remove('hidden');
             document.getElementById('btn-' + tabId).className = "tab-active px-6 py-3 transition-colors duration-200 focus:outline-none";
         }
 
         function showResults() {
             const resultDiv = document.getElementById('ai-results');
-            // Hiệu ứng Loading giả lập
             const btn = document.querySelector('button[onclick="showResults()"]');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> AI đang phân tích dữ liệu Hệ thống...';
+            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> AI đang phân tích dữ liệu...';
             btn.classList.replace('bg-purple-600', 'bg-gray-500');
             
             setTimeout(() => {
                 resultDiv.classList.remove('hidden');
-                btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Phân tích Hoàn tất';
+                btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Đã hoàn tất Báo cáo';
                 btn.classList.replace('bg-gray-500', 'bg-green-600');
-            }, 1500);
+            }, 1200);
         }
     </script>
 </body>
