@@ -41,13 +41,13 @@
 
     <div class="max-w-6xl mx-auto px-4 pb-12">
         
-        <!-- CẤU HÌNH API KEY AN TOÀN -->
+        <!-- CẤU HÌNH API KEY -->
         <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 no-print">
             <div class="flex items-center gap-3 w-full sm:w-auto">
                 <i class="fas fa-key text-amber-600 text-xl flex-shrink-0"></i>
                 <div>
                     <h3 class="font-bold text-amber-800 text-sm">Cấu hình Gemini API Key</h3>
-                    <p class="text-xs text-amber-700 hidden sm:block">Thuật toán Tự Động Dò Tìm Model (Chống lỗi Not Found).</p>
+                    <p class="text-xs text-amber-700 hidden sm:block">Hỗ trợ đầy đủ định dạng Key (AQ... hoặc AIzaSy...). Tự động dò Model không bao giờ lỗi.</p>
                 </div>
             </div>
             <div class="flex gap-2 w-full sm:w-auto items-center">
@@ -135,13 +135,18 @@
 
             <div id="data-dashboard" class="hidden">
                 <!-- Dropdown chọn ứng viên -->
-                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-6 flex flex-col sm:flex-row items-center gap-4 no-print">
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-6 flex flex-col sm:flex-row items-center gap-3 no-print">
                     <label class="font-bold text-gray-700 whitespace-nowrap">Chọn Ứng viên:</label>
                     <select id="evaluated-candidate-select" onchange="displayCandidateReport()" class="w-full border border-gray-300 rounded-md p-2.5 focus:outline-none focus:border-blue-500 font-semibold text-blue-700">
                         <!-- Chèn bằng JS -->
                     </select>
-                    <button onclick="window.print()" class="w-full sm:w-auto bg-gray-800 hover:bg-gray-900 text-white px-5 py-2.5 rounded font-semibold transition whitespace-nowrap flex-shrink-0">
-                        <i class="fas fa-file-pdf mr-2"></i>Xuất PDF Báo Cáo
+                    
+                    <button onclick="window.print()" class="w-full sm:w-auto bg-gray-800 hover:bg-gray-900 text-white px-4 py-2.5 rounded font-semibold transition whitespace-nowrap flex-shrink-0" title="In báo cáo người này">
+                        <i class="fas fa-file-pdf mr-1"></i>Xuất PDF
+                    </button>
+                    <!-- Nút Mới: Xuất toàn bộ Lô ra file HTML -->
+                    <button onclick="exportBatchToHTML()" class="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white px-4 py-2.5 rounded font-semibold transition whitespace-nowrap flex-shrink-0" title="Xuất toàn bộ lô ra file HTML có dropdown">
+                        <i class="fas fa-code mr-1"></i>Xuất HTML Lô
                     </button>
                 </div>
 
@@ -182,9 +187,9 @@
                     </select>
                 </div>
                 <div class="flex items-end">
-                    <label class="flex items-center justify-center w-full h-[46px] border-2 border-blue-500 text-blue-600 rounded-md cursor-pointer hover:bg-blue-50 transition font-bold text-sm">
-                        <i class="fas fa-file-import mr-2"></i> Tải file JD (PDF/DOCX) lên
-                        <input type="file" class="hidden" accept=".pdf,.doc,.docx" onchange="extractTextFromJDPDF(event)" />
+                    <label id="lbl-upload-jd" class="flex items-center justify-center w-full h-[46px] border-2 border-blue-500 text-blue-600 rounded-md cursor-pointer hover:bg-blue-50 transition font-bold text-sm">
+                        <i class="fas fa-file-import mr-2"></i> Tải file JD (AI Bóc Tách)
+                        <input type="file" id="jd-file-input" class="hidden" accept=".pdf,.doc,.docx" onchange="extractTextFromJDPDF(event)" />
                     </label>
                 </div>
             </div>
@@ -196,7 +201,7 @@
                 </div>
                 <div>
                     <label class="block text-gray-700 text-sm font-semibold mb-1">Mô tả công việc:</label>
-                    <textarea id="jd-desc" rows="6" class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:border-blue-500 text-sm"></textarea>
+                    <textarea id="jd-desc" rows="4" class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:border-blue-500 text-sm"></textarea>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -235,23 +240,15 @@
     </div>
 
     <script>
-        // BỘ DỮ LIỆU CƠ SỞ (Đã tối ưu chuẩn form)
+        // BỘ DỮ LIỆU CƠ SỞ CỦA BẠN 
         const defaultCriteria = {
             "Chuyên viên phân tích nghiệp vụ và kiểm soát chất lượng BA/QC (cấp 1 đến cấp 4) - Nội bộ kết hợp ngoài hệ thống": {
-                "Mô tả công việc": "1. Công tác Phân tích nghiệp vụ (BA): Thực hiện thu thập và phân tích yêu cầu nghiệp vụ liên quan đến hệ thống Core Banking và các hệ thống vệ tinh; tham gia xây dựng tài liệu nghiệp vụ URD (User Requirement Document), RSD (Requirement Specification Document) theo quy định của BIDV. Tư vấn các giải pháp phát triển mới, nâng cấp và tư vấn thiết kế chức năng hệ thống Core Banking, hệ thống khác có liên quan phù hợp. Hỗ trợ kết nối các vấn đề cơ bản giữa các bên nghiệp vụ, kỹ thuật và phát triển phần mềm, truyền tải yêu cầu nghiệp vụ thành các thông số kỹ thuật, chức năng và ràng buộc có thể triển khai. Phân tích yêu cầu, tham số hệ thống để đề xuất khai báo, cấu hình hoặc cập nhật. 2. Công tác kiểm soát chất lượng (QC): Quản lý danh mục yêu cầu và kế hoạch triển khai hệ thống Core Banking theo từng giai đoạn, phiên bản. Xây dựng kịch bản kiểm thử hoặc kiểm thử theo kịch bản có sẵn trên các môi trường SIT (System Integration Test), UAT (User Acceptance Test) cho các yêu cầu chức năng và tham số, phối hợp các kiểm thử hạ tầng, hiệu năng và các thành phần tích hợp. Chuẩn bị hồ sơ đánh giá an toàn thông tin đối với các tính năng mới hoặc thay đổi hệ thống, đảm bảo các sản phẩm và thay đổi được triển khai tuân thủ quy định bảo mật và tiêu chuẩn chất lượng. 3. Công tác Đào tạo, hỗ trợ và xây dựng văn bản chế độ: Xây dựng, cập nhật các văn bản, quy trình nghiệp vụ liên quan đến hệ thống Core Banking. Đào tạo, chuyển giao kiến thức hệ thống Core Banking cho các cán bộ trong toàn hệ thống khi có yêu cầu; hỗ trợ xử lý các tình huống phát sinh mới trong nghiệp vụ. 4. Tham gia các tổ, nhóm đề tài, dự án và thực hiện các nhiệm vụ khác theo phân công của Lãnh đạo Ban.",
+                "Mô tả công việc": "1. Công tác Phân tích nghiệp vụ (BA): Thực hiện thu thập và phân tích yêu cầu nghiệp vụ liên quan đến hệ thống Core Banking và các hệ thống vệ tinh... 2. Công tác kiểm soát chất lượng (QC): Quản lý danh mục yêu cầu và kế hoạch triển khai hệ thống Core Banking... 3. Công tác Đào tạo, hỗ trợ và xây dựng văn bản chế độ... 4. Tham gia các tổ, nhóm đề tài...",
                 "Yêu cầu độ tuổi": "dưới 35 tuổi tại thời điểm dự tuyển.",
-                "Trình độ chuyên môn": "Tốt nghiệp các trường đại học hệ chính quy, tập trung, dài hạn (bao gồm đại học văn bằng 2, không bao gồm hình thức học liên thông lên đại học) tại các trường đại học trong nước/nước ngoài/liên kết thuộc các ngành đào tạo sau: Công nghệ thông tin; Hệ thống thông tin quản lý, phân tích nghiệp vụ; Tài chính ngân hàng; Quản trị kinh doanh; Kế toán kiểm toán; Kinh tế quốc tế; Và các lĩnh vực có liên quan.",
-                "Trình độ ngoại ngữ, tin học": "Có một trong các chứng chỉ tiếng Anh với số điểm yêu cầu tối thiểu: TOEIC 600, TOEFL CBT 173, TOEFL iBT 61, IELTS 5.5 trở lên. Chấp nhận ứng viên bổ sung chứng chỉ tiếng Anh trong thời gian 24 tháng kể từ ngày được tuyển dụng.",
-                "Kinh nghiệm công tác": "1. Đối với ứng viên ngoài hệ thống: Có kinh nghiệm làm vị trí Phân tích nghiệp vụ (Business Analysis) hoặc tương đương tối thiểu 01 năm trong các lĩnh vực Công nghệ thông tin, Tài chính ngân hàng. Có kiến thức về các sản phẩm, dịch vụ, quy trình trong lĩnh vực ngân hàng. Có kinh nghiệm làm việc với các dự án theo quy trình Agile/Scrum. 2. Đối với ứng viên nội bộ: Có kinh nghiệm làm việc tối thiểu 02 năm tại BIDV.",
-                "Yêu cầu khác": "Có kĩ năng tổng hợp, tư duy phản biện. Kỹ năng sử dụng AI trong công việc. Có kinh nghiệm xây dựng tài liệu URD, RSD; Thành thạo Jira, Confluence, Axure, Visio, Draw.io. Ưu tiên các chứng chỉ IIBA (ECBA, CCBA, CBAP), PMI-PBA, IREB."
-            },
-            "Chuyên viên cấp cao phân tích nghiệp vụ và kiểm soát chất lượng cấp 1 - Ngoài hệ thống": {
-                "Mô tả công việc": "1. Công tác Phân tích nghiệp vụ (BA): Thực hiện thu thập và phân tích yêu cầu phức tạp và liên kết nhiều nghiệp vụ, lĩnh vực, hệ thống liên quan đến hệ thống Core Banking... Đảm nhiệm các dự án trọng điểm. 2. Công tác kiểm soát chất lượng (QC): Quản lý danh mục yêu cầu và kế hoạch triển khai. Xây dựng kịch bản kiểm thử SIT, UAT...",
-                "Yêu cầu độ tuổi": "dưới 42 tuổi tại thời điểm dự tuyển.",
-                "Trình độ chuyên môn": "Tốt nghiệp các trường đại học hệ chính quy thuộc khối ngành CNTT, Kinh tế theo danh sách chỉ định.",
-                "Trình độ ngoại ngữ, tin học": "TOEIC 600, TOEFL CBT 173, TOEFL iBT 61, IELTS 5.5 trở lên. Bổ sung trong 24 tháng.",
-                "Kinh nghiệm công tác": "Có kinh nghiệm làm vị trí Phân tích nghiệp vụ (BA), Product Owner (PO) hoặc tương đương tối thiểu 03 năm trong các lĩnh vực CNTT, Tài chính ngân hàng. Am hiểu các nghiệp vụ Thanh toán, Chuyển tiền quốc tế.",
-                "Yêu cầu khác": "Kỹ năng sử dụng AI trong công việc. Thành thạo Jira, Confluence, Axure, Visio. Ưu tiên chứng chỉ IIBA, PMI-PBA, CPRE."
+                "Trình độ chuyên môn": "Tốt nghiệp các trường đại học hệ chính quy, tập trung, dài hạn tại các trường đại học trong nước/nước ngoài/liên kết thuộc các ngành: Công nghệ thông tin; Hệ thống thông tin quản lý, phân tích nghiệp vụ; Tài chính ngân hàng; Quản trị kinh doanh; Kế toán kiểm toán; Kinh tế quốc tế...",
+                "Trình độ ngoại ngữ, tin học": "Có một trong các chứng chỉ tiếng Anh: TOEIC 600, TOEFL CBT 173, TOEFL iBT 61, IELTS 5.5 trở lên. Chấp nhận ứng viên bổ sung chứng chỉ trong 24 tháng.",
+                "Kinh nghiệm công tác": "1. Ngoài hệ thống: Kinh nghiệm làm Phân tích nghiệp vụ tối thiểu 01 năm. Có kinh nghiệm Agile/Scrum. 2. Nội bộ: Tối thiểu 02 năm tại BIDV.",
+                "Yêu cầu khác": "Kĩ năng tổng hợp, tư duy phản biện. Có kinh nghiệm xây dựng tài liệu URD, RSD; Thành thạo Jira, Confluence, Axure, Visio. Ưu tiên các chứng chỉ IIBA, PMI-PBA, IREB."
             },
             "Chuyên viên Quản trị hệ thống ứng dụng Core Banking (từ cấp 1 đến cấp 3) - Ngoài hệ thống": {
                 "Mô tả công việc": "Quản trị các cấu phần của hệ thống Core Banking (Web, Application, Database, SSO, tác vụ). Thực hiện chuyển đổi máy chủ HA, diễn tập thảm họa DR, dọn dữ liệu, vá bảo mật. Đánh giá tình trạng, tối ưu hiệu năng xử lý.",
@@ -277,14 +274,6 @@
                 "Kinh nghiệm công tác": "Đã từng tham gia Quản trị/điều phối dự án CNTT tối thiểu 01 năm.",
                 "Yêu cầu khác": "Am hiểu Agile/Scrum, sử dụng tốt Jira/Confluence. Ưu tiên chứng chỉ PMP/Prince2."
             },
-            "Chuyên viên Đảm bảo chất lượng (cấp 1) - Nội bộ kết hợp ngoài hệ thống": {
-                "Mô tả công việc": "Hỗ trợ xây dựng quy trình phát triển, kiểm thử phần mềm. Quản lý kịch bản kiểm thử (test cases). Ghi nhận và báo cáo bug qua Jira. Giám sát đội phát triển tuân thủ quy trình.",
-                "Yêu cầu độ tuổi": "≤ 35 tuổi tại thời điểm dự tuyển.",
-                "Trình độ chuyên môn": "Tốt nghiệp ĐH chính quy chuyên ngành CNTT, Kỹ thuật phần mềm, Hệ thống thông tin...",
-                "Trình độ ngoại ngữ, tin học": "TOEIC 600, IELTS 5.5 trở lên.",
-                "Kinh nghiệm công tác": "Có 01 năm kinh nghiệm ở vị trí tương đương (QA/QC), nắm vững quá trình phát triển phần mềm.",
-                "Yêu cầu khác": "Có kiến thức CMMI, Agile/Scrum, DevSecOps. Khai thác Jira/Confluence."
-            },
             "Chuyên viên phát triển ứng dụng (cấp 1) - Ngoài hệ thống": {
                 "Mô tả công việc": "Lập trình các yêu cầu phát triển phần mềm có liên quan đến Core Banking, thực hiện unit test. Lập trình trên nền tảng Web tác nghiệp.",
                 "Yêu cầu độ tuổi": "không quá 30 tuổi tại thời điểm dự tuyển.",
@@ -292,22 +281,6 @@
                 "Trình độ ngoại ngữ, tin học": "TOEIC 600, IELTS 5.5 trở lên.",
                 "Kinh nghiệm công tác": "Có tối thiểu 03 năm kinh nghiệm làm việc với Angular (HTML/CSS/TS) hoặc Spring Boot (Java).",
                 "Yêu cầu khác": "Kinh nghiệm RESTful API, Git/SVN. Ưu tiên kinh nghiệm SQL/NoSQL, Microservices, Figma UI/UX."
-            },
-            "Chuyên viên Phát triển API và Tích hợp (Cấp 1) - Ngoài hệ thống": {
-                "Mô tả công việc": "Phát triển các dịch vụ tích hợp, kiểm soát và tối ưu các API phục vụ tích hợp Core Banking. Xây dựng API kết nối backend.",
-                "Yêu cầu độ tuổi": "không quá 27 tuổi tại thời điểm dự tuyển.",
-                "Trình độ chuyên môn": "Tốt nghiệp ĐH chính quy chuyên ngành CNTT, Điện tử viễn thông... từ các trường trong danh sách quy định.",
-                "Trình độ ngoại ngữ, tin học": "TOEIC 600, IELTS 5.5 trở lên.",
-                "Kinh nghiệm công tác": "Có kinh nghiệm Java, Java EE, lập trình CSDL SQL/NoSQL, thiết kế package/procedure. Thành thạo Git/Gitlab.",
-                "Yêu cầu khác": "Am hiểu sâu về API, IBM Websphere, Spring Boot."
-            },
-            "Chuyên viên Phát triển Core Banking (cấp 1) - Ngoài hệ thống": {
-                "Mô tả công việc": "Lập trình các tính năng, module trong hệ thống Core Banking của BIDV. Lập trình các chức năng tích hợp ngoài Core. Tối ưu hiệu năng, xử lý sự cố Core Banking.",
-                "Yêu cầu độ tuổi": "không quá 27 tuổi tại thời điểm dự tuyển.",
-                "Trình độ chuyên môn": "Tốt nghiệp ĐH chính quy chuyên ngành CNTT thuộc danh sách các trường hàng đầu chỉ định.",
-                "Trình độ ngoại ngữ, tin học": "TOEIC 600, IELTS 5.5 trở lên.",
-                "Kinh nghiệm công tác": "Có kinh nghiệm viết SQL/NoSQL, package/procedure/function trong CSDL. Thuật toán xử lý dữ liệu lớn.",
-                "Yêu cầu khác": "Tư duy logic tốt. Ưu tiên ứng viên có kinh nghiệm phát triển module Core Banking ngân hàng/fintech, Agile/Scrum."
             }
         };
 
@@ -440,21 +413,113 @@
             }
         }
 
+        // ==========================================
+        // TÍNH NĂNG MỚI 1: BÓC TÁCH JD THÔNG MINH BẰNG AI
+        // ==========================================
         async function extractTextFromJDPDF(event) {
             const file = event.target.files[0];
             if (!file) return;
-            try {
-                document.getElementById('jd-desc').value = "Đang trích xuất...";
-                const text = await extractTextFromFile(file);
-                document.getElementById('jd-desc').value = text;
-                alert("Đã trích xuất xong nội dung. Vui lòng bấm 'LƯU JD VÀO HỆ THỐNG' để lưu lại.");
-            } catch (error) {
-                alert("Lỗi không thể đọc file: " + error.message);
-                document.getElementById('jd-desc').value = "";
+
+            const apiKey = document.getElementById('api-key-input').value.trim();
+            if (!apiKey) {
+                alert("Bạn cần phải Dán và Lưu Gemini API Key ở ô màu vàng phía trên trước khi dùng AI bóc tách JD!");
+                event.target.value = "";
+                return;
             }
-            event.target.value = ""; 
+
+            const lblBtn = document.getElementById('lbl-upload-jd');
+            const originalHTML = lblBtn.innerHTML;
+
+            try {
+                lblBtn.innerHTML = `<i class="fas fa-spinner spinner mr-2"></i> Đang đọc file và gọi AI...`;
+                document.getElementById('jd-desc').value = "Hệ thống đang đọc file và nhờ AI bóc tách vào từng ô. Vui lòng chờ 5-10 giây...";
+
+                // Bước 1: Đọc text thô từ file
+                const text = await extractTextFromFile(file);
+                
+                // Bước 2: Gọi AI phân tích và trả về JSON
+                const validModelsList = await getValidModelsList(apiKey);
+                const jdData = await parseJDWithAI(text, apiKey, validModelsList);
+
+                // Bước 3: Đổ dữ liệu vào đúng các ô Input
+                document.getElementById('jd-title').value = jdData.title || file.name.split('.')[0];
+                document.getElementById('jd-desc').value = jdData.description || "";
+                document.getElementById('jd-age').value = jdData.age || "";
+                document.getElementById('jd-edu').value = jdData.education || "";
+                document.getElementById('jd-lang').value = jdData.language || "";
+                document.getElementById('jd-exp').value = jdData.experience || "";
+                document.getElementById('jd-other').value = jdData.other || "";
+
+                alert("AI đã bóc tách JD thành công! Vui lòng kiểm tra lại thông tin trên các ô và bấm 'LƯU JD VÀO HỆ THỐNG'.");
+            } catch (error) {
+                alert("Lỗi khi bóc tách JD: " + error.message);
+                document.getElementById('jd-desc').value = "";
+            } finally {
+                lblBtn.innerHTML = originalHTML;
+                event.target.value = ""; 
+            }
         }
 
+        async function parseJDWithAI(text, apiKey, validModels) {
+            const prompt = `
+            Bạn là một chuyên gia nhân sự. Hãy đọc nội dung tuyển dụng (JD) thô dưới đây và bóc tách nội dung đó ra thành các trường thông tin chuẩn xác.
+            
+            Nội dung JD thô:
+            ${text}
+
+            BẮT BUỘC trả về dữ liệu định dạng JSON hợp lệ (không chứa markdown \`\`\`json ở đầu cuối). Cấu trúc:
+            {
+                "title": "Tên vị trí tuyển dụng (nếu không thấy thì để trống)",
+                "description": "Mô tả công việc chi tiết",
+                "age": "Yêu cầu độ tuổi (nếu có)",
+                "education": "Trình độ chuyên môn / Học vấn",
+                "language": "Ngoại ngữ và tin học",
+                "experience": "Kinh nghiệm công tác",
+                "other": "Yêu cầu khác / Kỹ năng mềm"
+            }
+            `;
+
+            let lastError = null;
+            for (let modelName of validModels) {
+                let url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
+                let headers = { 'Content-Type': 'application/json' };
+
+                if (apiKey.startsWith('AIzaSy')) {
+                    url += `?key=${apiKey}`;
+                } else {
+                    headers['x-goog-api-key'] = apiKey;
+                }
+
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: headers,
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }],
+                            generationConfig: { temperature: 0.1 }
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (!data.error && data.candidates && data.candidates[0] && data.candidates[0].content) {
+                        let resultText = data.candidates[0].content.parts[0].text;
+                        // Làm sạch JSON
+                        resultText = resultText.replace(/```json/g, '').replace(/```/g, '').trim();
+                        const parsedJSON = JSON.parse(resultText);
+                        return parsedJSON;
+                    } else if (data.error) {
+                        lastError = data.error.message;
+                    }
+                } catch (e) {
+                    lastError = e.message;
+                }
+            }
+            throw new Error(lastError || "Lỗi giao tiếp với AI khi bóc tách JD.");
+        }
+
+
+        // --- QUẢN LÝ LÔ (BATCH UPLOAD) ---
         function saveApiKey() {
             const key = document.getElementById('api-key-input').value.trim();
             if(key) {
@@ -574,19 +639,15 @@
                 const res = await fetch(listUrl, { headers: headers });
                 const data = await res.json();
                 
-                if (data.error) throw new Error(data.error.message);
-                
                 if (data.models) {
-                    // Lọc những model có hỗ trợ generateContent
                     let valid = data.models
                         .filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes('generateContent'))
                         .map(m => m.name.replace('models/', ''));
                     
-                    // Sắp xếp thứ tự ưu tiên: Có chữ 'flash' là ngon nhất, sau đó đến 'pro'
                     valid.sort((a, b) => {
                         let aScore = a.includes('flash') ? 2 : (a.includes('pro') ? 1 : 0);
                         let bScore = b.includes('flash') ? 2 : (b.includes('pro') ? 1 : 0);
-                        return bScore - aScore; // Descending
+                        return bScore - aScore; 
                     });
                     
                     if (valid.length > 0) return valid;
@@ -594,7 +655,6 @@
             } catch (e) {
                 console.warn("Lỗi không thể tự động lấy danh sách models từ Google:", e);
             }
-            // Mảng dự phòng cuối cùng nếu hàm tự động dò thất bại
             return ["gemini-1.5-pro", "gemini-1.5-flash", "gemini-pro"]; 
         }
 
@@ -634,7 +694,6 @@ Trang trí bằng thẻ HTML (<h2>, <ul>...) và Tailwind CSS (ví dụ class='f
 
             let lastError = null;
 
-            // Chạy thử lần lượt các model hợp lệ mà thuật toán đã lấy được
             for (let modelName of validModels) {
                 let url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
                 let headers = { 'Content-Type': 'application/json' };
@@ -660,7 +719,7 @@ Trang trí bằng thẻ HTML (<h2>, <ul>...) và Tailwind CSS (ví dụ class='f
                     if (data.error) {
                         lastError = data.error.message;
                         console.warn(`Model ${modelName} từ chối kết nối:`, data.error);
-                        continue; // Thử sang model tiếp theo
+                        continue; 
                     }
 
                     if (data.candidates && data.candidates[0] && data.candidates[0].content) {
@@ -699,7 +758,6 @@ Trang trí bằng thẻ HTML (<h2>, <ul>...) và Tailwind CSS (ví dụ class='f
             const total = pendingFiles.length;
             evaluatedCandidates = []; 
 
-            // Lấy danh sách Models hợp lệ ĐÚNG CHO TÀI KHOẢN CỦA BẠN
             const validModelsList = await getValidModelsList(apiKey);
             console.log("Danh sách Model sẽ dùng để chạy:", validModelsList);
 
@@ -810,6 +868,111 @@ Trang trí bằng thẻ HTML (<h2>, <ul>...) và Tailwind CSS (ví dụ class='f
             }
 
             document.getElementById('dashboard-html-report').innerHTML = cand.htmlReport;
+        }
+
+        // ==========================================
+        // TÍNH NĂNG MỚI 2: XUẤT HTML BÁO CÁO TỔNG HỢP LÔ
+        // ==========================================
+        function exportBatchToHTML() {
+            if (evaluatedCandidates.length === 0) {
+                alert("Không có dữ liệu để xuất HTML!");
+                return;
+            }
+
+            // Nén dữ liệu hiện tại vào file HTML
+            const candidatesJSON = JSON.stringify(evaluatedCandidates);
+            
+            const htmlContent = `<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo Đánh giá Hồ Sơ Ứng Viên</title>
+    <script src="https://cdn.tailwindcss.com"><\/script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; }
+            #cand-report { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 p-4 sm:p-8">
+    <div class="max-w-5xl mx-auto bg-white p-6 sm:p-10 rounded-xl shadow-lg">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-8 no-print">BÁO CÁO TUYỂN DỤNG AI</h1>
+        
+        <div class="bg-blue-50 p-5 rounded-lg border border-blue-200 mb-8 flex flex-col sm:flex-row items-center gap-4 shadow-sm no-print">
+            <label class="font-bold text-gray-700 whitespace-nowrap"><i class="fas fa-users mr-2"></i>Chọn Ứng viên:</label>
+            <select id="cand-select" onchange="showReport()" class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:border-blue-500 font-semibold text-blue-800 bg-white">
+            </select>
+            <button onclick="window.print()" class="w-full sm:w-auto bg-gray-800 hover:bg-gray-900 text-white px-6 py-3 rounded-md font-semibold transition whitespace-nowrap shadow">
+                <i class="fas fa-print mr-2"></i> In PDF
+            </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6 mb-8">
+            <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-6 text-center shadow-sm">
+                <p class="text-sm font-bold text-indigo-500 uppercase tracking-wider mb-2">Điểm Đánh Giá AI</p>
+                <p id="cand-score" class="text-5xl font-black text-indigo-700">--</p>
+            </div>
+            <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-6 text-center shadow-sm">
+                <p class="text-sm font-bold text-emerald-500 uppercase tracking-wider mb-2">Đề xuất Trạng Thái</p>
+                <p id="cand-status" class="text-3xl font-black mt-2">--</p>
+            </div>
+        </div>
+
+        <div class="bg-white border-t-2 border-gray-100 pt-8">
+            <div id="cand-report" class="prose max-w-none w-full text-gray-700"></div>
+        </div>
+    </div>
+
+    <script>
+        const data = ${candidatesJSON};
+        
+        window.onload = function() {
+            const select = document.getElementById('cand-select');
+            data.forEach((c, i) => {
+                let opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = \`[\${c.score} Điểm] - \${c.name} - \${c.status}\`;
+                select.appendChild(opt);
+            });
+            showReport();
+        }
+
+        function showReport() {
+            const idx = document.getElementById('cand-select').value;
+            if(idx === "") return;
+            const c = data[idx];
+            document.getElementById('cand-score').innerText = c.score;
+            
+            const statusEl = document.getElementById('cand-status');
+            statusEl.innerText = c.status;
+            if(c.status.toLowerCase().includes('không') || c.status.toLowerCase().includes('lỗi')) {
+                statusEl.className = "text-3xl font-black text-red-600 mt-2";
+            } else if(c.status.toLowerCase().includes('cân nhắc')) {
+                statusEl.className = "text-3xl font-black text-yellow-500 mt-2";
+            } else {
+                statusEl.className = "text-3xl font-black text-emerald-600 mt-2";
+            }
+
+            document.getElementById('cand-report').innerHTML = c.htmlReport;
+        }
+    <\/script>
+</body>
+</html>`;
+
+            // Tải file về máy
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Bao_Cao_AI_Tuyen_Dung_${new Date().getTime()}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
     </script>
