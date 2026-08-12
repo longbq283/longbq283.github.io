@@ -163,7 +163,7 @@
                 <div id="detail-report-view" class="hidden">
                     <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 border-b pb-4 no-print bg-blue-50 p-4 rounded-lg">
                         <button onclick="backToTable()" class="bg-white border border-gray-300 hover:bg-gray-100 text-gray-800 px-5 py-2.5 rounded-md font-bold transition whitespace-nowrap text-sm shadow-sm">
-                            <i class="fas fa-arrow-left mr-2"></i>Quay lại bảng
+                            <i class="fas fa-arrow-left mr-2"></i>Quay lại danh sách
                         </button>
                         <h2 class="text-lg font-bold text-blue-700 truncate max-w-md" id="detail-cand-name">Tên ứng viên</h2>
                         <button onclick="window.print()" class="bg-gray-800 hover:bg-gray-900 text-white px-5 py-2.5 rounded-md font-bold transition whitespace-nowrap text-sm shadow-sm">
@@ -263,7 +263,7 @@
     </div>
 
     <script>
-        // BỘ DỮ LIỆU CƠ SỞ (Đã chuẩn hóa 9 vị trí gốc)
+        // BỘ DỮ LIỆU CƠ SỞ (Đã chuẩn hóa 9 vị trí)
         const defaultCriteria = {
             "Chuyên viên phân tích nghiệp vụ và kiểm soát chất lượng BA/QC (cấp 1 đến cấp 4) - Nội bộ kết hợp ngoài hệ thống": {
                 "Mô tả công việc": "1. Công tác Phân tích nghiệp vụ (BA): Thực hiện thu thập và phân tích yêu cầu nghiệp vụ liên quan đến hệ thống Core Banking và các hệ thống vệ tinh; tham gia xây dựng tài liệu nghiệp vụ URD (User Requirement Document), RSD (Requirement Specification Document) theo quy định của BIDV. Tư vấn các giải pháp phát triển mới, nâng cấp và tư vấn thiết kế chức năng hệ thống Core Banking, hệ thống khác có liên quan phù hợp. Hỗ trợ kết nối các vấn đề cơ bản giữa các bên nghiệp vụ, kỹ thuật và phát triển phần mềm, truyền tải yêu cầu nghiệp vụ thành các thông số kỹ thuật, chức năng và ràng buộc có thể triển khai. Phân tích yêu cầu, tham số hệ thống để đề xuất khai báo, cấu hình hoặc cập nhật. 2. Công tác kiểm soát chất lượng (QC): Quản lý danh mục yêu cầu và kế hoạch triển khai hệ thống Core Banking theo từng giai đoạn, phiên bản. Xây dựng kịch bản kiểm thử hoặc kiểm thử theo kịch bản có sẵn trên các môi trường SIT (System Integration Test), UAT (User Acceptance Test) cho các yêu cầu chức năng và tham số, phối hợp các kiểm thử hạ tầng, hiệu năng và các thành phần tích hợp. Chuẩn bị hồ sơ đánh giá an toàn thông tin đối với các tính năng mới hoặc thay đổi hệ thống, đảm bảo các sản phẩm và thay đổi được triển khai tuân thủ quy định bảo mật và tiêu chuẩn chất lượng. 3. Công tác Đào tạo, hỗ trợ và xây dựng văn bản chế độ: Xây dựng, cập nhật các văn bản, quy trình nghiệp vụ liên quan đến hệ thống Core Banking. Đào tạo, chuyển giao kiến thức hệ thống Core Banking cho các cán bộ trong toàn hệ thống khi có yêu cầu; hỗ trợ xử lý các tình huống phát sinh mới trong nghiệp vụ. 4. Tham gia các tổ, nhóm đề tài, dự án và thực hiện các nhiệm vụ khác theo phân công của Lãnh đạo Ban.",
@@ -475,9 +475,8 @@
 
             const apiKey = document.getElementById('api-key-input').value.trim();
             if (!apiKey) {
-                alert("Vui lòng Lưu Gemini API Key ở ô phía trên trước khi dùng tính năng AI bóc tách JD!");
-                event.target.value = "";
-                return;
+                alert("Vui lòng Lưu Gemini API Key ở ô phía trên trước khi dùng AI bóc tách JD!");
+                event.target.value = ""; return;
             }
 
             const lblBtn = document.getElementById('lbl-upload-jd');
@@ -511,21 +510,18 @@
 
         async function parseJDWithAI(text, apiKey, validModels) {
             const prompt = `
-            Bạn là chuyên gia nhân sự. Hãy đọc nội dung JD thô dưới đây và phân tách vào các trường chuẩn.
-            
+            Bạn là chuyên gia nhân sự. Hãy đọc nội dung JD thô dưới đây và phân tách vào các trường tương ứng.
             Nội dung JD:
             ${text}
 
-            BẮT BUỘC TRẢ VỀ CHUỖI JSON HỢP LỆ (KHÔNG bọc trong markdown \`\`\`json):
-            {
-                "title": "Tên vị trí (nếu không có để trống)",
-                "description": "Mô tả công việc chi tiết",
-                "age": "Độ tuổi yêu cầu",
-                "education": "Trình độ học vấn/chuyên môn",
-                "language": "Ngoại ngữ/tin học",
-                "experience": "Kinh nghiệm công tác",
-                "other": "Yêu cầu khác/kỹ năng mềm"
-            }
+            Hãy trả về ĐÚNG CẤU TRÚC TEXT (Không dùng JSON, không dùng Code Block) như sau:
+            <TITLE>Tên vị trí (nếu không có để trống)</TITLE>
+            <DESC>Mô tả công việc chi tiết</DESC>
+            <AGE>Độ tuổi yêu cầu</AGE>
+            <EDU>Trình độ học vấn/chuyên môn</EDU>
+            <LANG>Ngoại ngữ/tin học</LANG>
+            <EXP>Kinh nghiệm công tác</EXP>
+            <OTHER>Yêu cầu khác/kỹ năng mềm</OTHER>
             `;
 
             let lastError = null;
@@ -537,21 +533,30 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.1 } })
                     });
-                    const textRes = await response.text();
+                    const data = await response.json();
                     
-                    try {
-                        let cleanText = textRes.replace(/```json/gi, '').replace(/```/g, '').trim();
-                        let firstBrace = cleanText.indexOf('{');
-                        let lastBrace = cleanText.lastIndexOf('}');
-                        if (firstBrace !== -1 && lastBrace !== -1) {
-                            return JSON.parse(cleanText.substring(firstBrace, lastBrace + 1));
-                        }
-                    } catch(e) {
-                        lastError = "Lỗi parse JSON từ Google AI.";
-                    }
+                    if (!data.error && data.candidates) {
+                        let text = data.candidates[0].content.parts[0].text;
+                        
+                        const extract = (tag) => {
+                            const regex = new RegExp(`<${tag}>([\\s\\S]*?)</${tag}>`, 'i');
+                            const match = text.match(regex);
+                            return match ? match[1].trim() : "";
+                        };
+
+                        return {
+                            title: extract("TITLE"),
+                            description: extract("DESC"),
+                            age: extract("AGE"),
+                            education: extract("EDU"),
+                            language: extract("LANG"),
+                            experience: extract("EXP"),
+                            other: extract("OTHER")
+                        };
+                    } else if (data.error) { lastError = data.error.message; }
                 } catch (e) { lastError = e.message; }
             }
-            throw new Error(lastError || "AI không thể phản hồi bóc tách JD.");
+            throw new Error(lastError || "Lỗi giao tiếp với AI khi bóc tách JD.");
         }
 
         // --- QUẢN LÝ LÔ (BATCH UPLOAD) & API KEY ---
@@ -666,23 +671,18 @@
                     headers: { 'Content-Type': 'application/json' }
                 });
                 
-                const text = await res.text();
-                try {
-                    const data = JSON.parse(text);
-                    if (data.models) {
-                        let valid = data.models
-                            .filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes('generateContent'))
-                            .map(m => m.name.replace('models/', ''));
-                        
-                        valid.sort((a, b) => {
-                            let aScore = a.includes('flash') ? 2 : (a.includes('pro') ? 1 : 0);
-                            let bScore = b.includes('flash') ? 2 : (b.includes('pro') ? 1 : 0);
-                            return bScore - aScore; 
-                        });
-                        if (valid.length > 0) return valid;
-                    }
-                } catch(e) {
-                    console.warn("API trả về HTML khi get models. Sẽ sử dụng list fallback.");
+                const data = await res.json();
+                if (data.models) {
+                    let valid = data.models
+                        .filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes('generateContent'))
+                        .map(m => m.name.replace('models/', ''));
+                    
+                    valid.sort((a, b) => {
+                        let aScore = a.includes('flash') ? 2 : (a.includes('pro') ? 1 : 0);
+                        let bScore = b.includes('flash') ? 2 : (b.includes('pro') ? 1 : 0);
+                        return bScore - aScore; 
+                    });
+                    if (valid.length > 0) return valid;
                 }
             } catch (e) {
                 console.warn("Không lấy được danh sách models:", e);
@@ -694,7 +694,7 @@
         async function callGeminiAI(apiKey, jobTitle, jdObject, cvText, validModels) {
             const prompt = `
 Bạn là Giám đốc Nhân sự (CHRO) và Chuyên gia phỏng vấn kỹ thuật cấp cao.
-Yêu cầu: So sánh CỰC KỲ CHI TIẾT VÀ KHẮT KHE nội dung CV của ứng viên với TỪNG TIÊU CHÍ trong JD. Không được đánh giá chung chung.
+Yêu cầu: So sánh CỰC KỲ CHI TIẾT VÀ KHẮT KHE nội dung CV của ứng viên với TỪNG TIÊU CHÍ trong JD dưới đây.
 
 VỊ TRÍ TUYỂN DỤNG: ${jobTitle}
 CHI TIẾT TIÊU CHÍ (JD):
@@ -708,30 +708,29 @@ CHI TIẾT TIÊU CHÍ (JD):
 NỘI DUNG CV ỨNG VIÊN:
 ${cvText}
 
-BẮT BUỘC TRẢ VỀ JSON HỢP LỆ (KHÔNG bọc Markdown \`\`\`json):
-{
-  "score": "Điểm tổng quan từ 1-10 (ví dụ: 8.5)",
-  "status": "Chỉ được chọn 1 trong 2: Đạt hoặc Không đạt", 
-  "htmlReport": "<div class='report-section'>...MÃ HTML BÁO CÁO...</div>"
-}
+BẮT BUỘC TRẢ VỀ DỮ LIỆU THEO ĐÚNG ĐỊNH DẠNG TEXT DƯỚI ĐÂY (KHÔNG SỬ DỤNG JSON ĐỂ TRÁNH LỖI FORMATTING, CHỈ CẦN DÙNG CÁC THẺ HTML NHƯ YÊU CẦU):
+<SCORE>Điểm tổng quan từ 1-10 (chỉ xuất một con số, ví dụ: 8.5 hoặc 4.5)</SCORE>
+<REPORT>
+<div class='report-section'>
+    <h1 class='text-2xl font-bold text-gray-700 mb-6 border-b pb-2'>BÁO CÁO ĐÁNH GIÁ CHI TIẾT</h1>
+    
+    <h2 class='text-xl font-bold text-blue-700 mb-4'>PHẦN 1: ĐÁNH GIÁ CHI TIẾT TỪNG TIÊU CHÍ</h2>
+    <!-- BẮT BUỘC TRÌNH BÀY TỪNG TIÊU CHÍ (Kinh nghiệm, Ngoại ngữ, Chuyên môn...) DƯỚI DẠNG DANH SÁCH RÕ RÀNG. MỖI TIÊU CHÍ PHẢI CÓ THANG ĐIỂM RIÊNG. Nêu rõ ứng viên có gì và thiếu hụt gì so với JD -->
 
-YÊU CẦU NỘI DUNG 'htmlReport':
-PHẦN I: ĐÁNH GIÁ CHI TIẾT TỪNG TIÊU CHÍ (So sánh tỉ mỉ JD và CV)
-Liệt kê rõ ràng TỪNG tiêu chí (Độ tuổi, Chuyên môn, Ngoại ngữ, Kinh nghiệm...). Phân tích sâu: Ứng viên có gì? JD yêu cầu gì? Ứng viên thiếu hụt hay đáp ứng xuất sắc? Chấm điểm cho từng tiêu chí nhỏ. Đưa ra lập luận rõ ràng.
-
-PHẦN II: 10 CÂU HỎI PHỎNG VẤN CHUYÊN SÂU
-Chia làm 2 nhóm rõ ràng:
-- Nhóm 1: 5 Câu hỏi cơ bản (Dễ) - Xác minh thông tin, kiến thức nền tảng dự án dựa trên CV.
-- Nhóm 2: 5 Câu hỏi tình huống/chuyên sâu (Khó) - Xoáy sâu vào các công nghệ, dự án phức tạp ứng viên đã làm. Đặt tình huống rủi ro thực tế bám sát JD để thử thách tư duy.
-*Mỗi câu hỏi phải đi kèm 'Gợi ý đáp án kỳ vọng' và 'Thang điểm (1-10)'.
-
-Sử dụng các thẻ HTML (<h2>, <h3>, <ul>, <li>, <p>) và Tailwind CSS (ví dụ: class='text-lg font-bold text-blue-700 mb-2') để trang trí thật đẹp mắt. Dùng dấu nháy đơn (') cho thuộc tính HTML.
+    <h2 class='text-xl font-bold text-blue-700 mt-8 mb-4'>PHẦN 2: BỘ CÂU HỎI PHỎNG VẤN CHUYÊN SÂU</h2>
+    <!-- Chia làm 2 nhóm rõ ràng -->
+    <h3 class='text-lg font-bold text-gray-800 mt-4 mb-2'>Nhóm 1: Câu hỏi cơ bản (Xác minh CV) - 5 Câu</h3>
+    <!-- 5 câu hỏi dựa trên dự án ứng viên viết, kèm Gợi ý đáp án và Thang điểm -->
+    
+    <h3 class='text-lg font-bold text-gray-800 mt-6 mb-2'>Nhóm 2: Câu hỏi tình huống / Rủi ro chuyên sâu - 5 Câu</h3>
+    <!-- 5 câu hỏi cực khó xoáy vào chuyên môn vị trí và rủi ro thực tế, kèm Gợi ý đáp án và Thang điểm -->
+</div>
+</REPORT>
 `;
 
             let lastError = null;
 
             for (let modelName of validModels) {
-                // TRUYỀN KEY TRỰC TIẾP TRÊN URL
                 let url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
                 try {
@@ -744,14 +743,7 @@ Sử dụng các thẻ HTML (<h2>, <h3>, <ul>, <li>, <p>) và Tailwind CSS (ví 
                         })
                     });
 
-                    const textRes = await response.text();
-                    let data;
-                    try {
-                        data = JSON.parse(textRes);
-                    } catch(e) {
-                        lastError = "Máy chủ trả về HTML thay vì dữ liệu JSON. API Key có thể bị lỗi xác thực.";
-                        continue; 
-                    }
+                    const data = await response.json();
 
                     if (data.error) {
                         lastError = data.error.message;
@@ -810,28 +802,31 @@ Sử dụng các thẻ HTML (<h2>, <h3>, <ul>, <li>, <p>) và Tailwind CSS (ví 
                     const cvText = await extractTextFromFile(currentFile);
                     const aiResultText = await callGeminiAI(apiKey, selectedJob, jobCriteria, cvText, validModelsList);
                     
-                    let score = "N/A", status = "Cân nhắc", htmlReport = aiResultText;
-                    
-                    try {
-                        let cleanText = aiResultText.replace(/```html/gi, '').replace(/```json/gi, '').replace(/```/g, '').trim();
-                        if (cleanText.includes('{') && cleanText.includes('}')) {
-                            const firstBrace = cleanText.indexOf('{');
-                            const lastBrace = cleanText.lastIndexOf('}');
-                            const jsonSub = cleanText.substring(firstBrace, lastBrace + 1);
-                            const parsed = JSON.parse(jsonSub);
-                            score = parsed.score || "N/A";
-                            status = parsed.status || "Đạt";
-                            htmlReport = parsed.htmlReport || cleanText;
-                        } else {
-                            htmlReport = cleanText;
-                        }
-                    } catch(err) {
-                        htmlReport = aiResultText;
+                    let score = "0";
+                    let htmlReport = aiResultText;
+
+                    // Trích xuất Điểm bằng Regex an toàn thay vì parse JSON
+                    const scoreMatch = aiResultText.match(/<SCORE>([\s\S]*?)<\/SCORE>/i);
+                    if (scoreMatch) score = scoreMatch[1].trim();
+
+                    // Chuẩn hóa điểm thành số
+                    let numScore = parseFloat(score.replace(',', '.').replace('/10', ''));
+                    if (isNaN(numScore)) numScore = 0;
+
+                    // Logic Xét Đạt / Không Đạt (>= 5 là Đạt)
+                    let status = (numScore >= 5) ? "Đạt" : "Không đạt";
+
+                    // Trích xuất Báo Cáo
+                    const reportMatch = aiResultText.match(/<REPORT>([\s\S]*?)<\/REPORT>/i);
+                    if (reportMatch) {
+                        htmlReport = reportMatch[1].trim();
+                    } else {
+                        htmlReport = aiResultText.replace(/<SCORE>[\s\S]*?<\/SCORE>/gi, '').trim();
                     }
 
                     evaluatedCandidates.push({
                         name: currentFile.name.replace(/\.[^/.]+$/, ""),
-                        score: score,
+                        score: numScore.toString(),
                         status: status,
                         htmlReport: htmlReport
                     });
@@ -840,8 +835,8 @@ Sử dụng các thẻ HTML (<h2>, <h3>, <ul>, <li>, <p>) và Tailwind CSS (ví 
                     console.error("Lỗi khi xử lý file " + currentFile.name, error);
                     evaluatedCandidates.push({
                         name: currentFile.name.replace(/\.[^/.]+$/, ""),
-                        score: "Lỗi",
-                        status: "Thất bại",
+                        score: "N/A",
+                        status: "Lỗi",
                         htmlReport: `<div class="p-6 bg-red-50 text-red-600 rounded-lg border border-red-200">
                                         <h3 class="font-bold text-lg mb-2"><i class="fas fa-exclamation-triangle mr-2"></i>Không thể phân tích file này</h3>
                                         <p><strong>Chi tiết lỗi:</strong> ${error.message}</p>
@@ -891,21 +886,23 @@ Sử dụng các thẻ HTML (<h2>, <h3>, <ul>, <li>, <p>) và Tailwind CSS (ví 
                 
                 const tdScore = document.createElement('td');
                 tdScore.className = "px-5 py-4 text-sm text-center font-bold text-indigo-600";
-                tdScore.textContent = cand.score;
+                tdScore.textContent = cand.score !== "N/A" ? cand.score + "/10" : "N/A";
 
                 const tdStatus = document.createElement('td');
                 tdStatus.className = "px-5 py-4 text-sm text-center font-bold";
-                if(cand.status.toLowerCase().includes('không') || cand.status.toLowerCase().includes('thất bại') || cand.status.toLowerCase().includes('lỗi')) {
-                    tdStatus.innerHTML = `<span class="bg-red-100 text-red-700 px-3 py-1 rounded-full">${cand.status}</span>`;
+                if (cand.status === "Không đạt") {
+                    tdStatus.innerHTML = `<span class="bg-red-100 text-red-700 px-4 py-1.5 rounded-full">Không đạt</span>`;
+                } else if (cand.status === "Đạt") {
+                    tdStatus.innerHTML = `<span class="bg-green-100 text-green-700 px-4 py-1.5 rounded-full">Đạt</span>`;
                 } else {
-                    tdStatus.innerHTML = `<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full">${cand.status}</span>`;
+                    tdStatus.innerHTML = `<span class="bg-gray-100 text-gray-700 px-4 py-1.5 rounded-full">Lỗi</span>`;
                 }
 
                 const tdAction = document.createElement('td');
                 tdAction.className = "px-5 py-4 text-sm text-center";
                 tdAction.innerHTML = `
-                    <button onclick="viewCandidateDetail(${idx})" class="text-blue-600 hover:text-blue-800 transition bg-blue-100 hover:bg-blue-200 px-3 py-1.5 rounded-md shadow-sm font-semibold" title="Đánh giá chi tiết">
-                        <i class="fas fa-eye mr-1"></i> Đánh giá chi tiết
+                    <button onclick="viewCandidateDetail(${idx})" class="text-blue-600 hover:text-blue-800 transition bg-blue-100 hover:bg-blue-200 px-4 py-2 rounded-md shadow-sm font-semibold whitespace-nowrap" title="Đánh giá chi tiết">
+                        <i class="fas fa-eye mr-2"></i> Đánh giá chi tiết
                     </button>
                 `;
 
@@ -925,16 +922,16 @@ Sử dụng các thẻ HTML (<h2>, <h3>, <ul>, <li>, <p>) và Tailwind CSS (ví 
             document.getElementById('detail-report-view').classList.remove('hidden');
 
             document.getElementById('detail-cand-name').innerText = "Hồ sơ: " + cand.name;
-            document.getElementById('dashboard-score').innerText = cand.score;
+            document.getElementById('dashboard-score').innerText = cand.score !== "N/A" ? cand.score + "/10" : "N/A";
             
             const statusEl = document.getElementById('dashboard-status');
             statusEl.innerText = cand.status;
-            if(cand.status.toLowerCase().includes('không') || cand.status.toLowerCase().includes('lỗi') || cand.status.toLowerCase().includes('thất bại')) {
+            if (cand.status === "Không đạt") {
                 statusEl.className = "text-2xl font-black text-red-600 mt-1";
-            } else if(cand.status.toLowerCase().includes('cân nhắc')) {
-                statusEl.className = "text-2xl font-black text-yellow-600 mt-1";
-            } else {
+            } else if (cand.status === "Đạt") {
                 statusEl.className = "text-2xl font-black text-emerald-600 mt-1";
+            } else {
+                statusEl.className = "text-2xl font-black text-gray-600 mt-1";
             }
 
             document.getElementById('dashboard-html-report').innerHTML = cand.htmlReport;
@@ -960,8 +957,8 @@ Sử dụng các thẻ HTML (<h2>, <h3>, <ul>, <li>, <p>) và Tailwind CSS (ví 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Báo cáo Đánh giá Lô CV Tuyển Dụng</title>
-    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"><\/script>
-    <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css)">
+    <script src="https://cdn.tailwindcss.com"><\/script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @media print {
             .no-print { display: none !important; }
@@ -971,14 +968,14 @@ Sử dụng các thẻ HTML (<h2>, <h3>, <ul>, <li>, <p>) và Tailwind CSS (ví 
 </head>
 <body class="bg-gray-100 text-gray-800 p-4 sm:p-8">
     <div class="max-w-6xl mx-auto bg-white p-6 sm:p-10 rounded-xl shadow-lg">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-8 no-print"><i class="fas fa-robot text-purple-600 mr-2"></i> BÁO CÁO PHÂN TÍCH CV AI</h1>
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-8 no-print"><i class="fas fa-robot text-purple-600 mr-2"></i> BÁO CÁO ĐÁNH GIÁ ỨNG VIÊN</h1>
         
         <div class="bg-blue-50 p-5 rounded-lg border border-blue-200 mb-8 flex flex-col sm:flex-row items-center gap-4 shadow-sm no-print">
-            <label class="font-bold text-gray-700 whitespace-nowrap"><i class="fas fa-user-tie mr-2"></i>Chọn Ứng viên để xem:</label>
+            <label class="font-bold text-gray-700 whitespace-nowrap"><i class="fas fa-user-tie mr-2"></i>Chọn Ứng viên:</label>
             <select id="cand-select" onchange="showReport()" class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:border-blue-500 font-semibold text-blue-800 bg-white">
             </select>
             <button onclick="window.print()" class="w-full sm:w-auto bg-gray-800 hover:bg-gray-900 text-white px-6 py-3 rounded-md font-semibold transition whitespace-nowrap shadow">
-                <i class="fas fa-print mr-2"></i> In PDF Ứng viên này
+                <i class="fas fa-print mr-2"></i> In PDF (Ứng viên hiện tại)
             </button>
         </div>
 
@@ -988,13 +985,13 @@ Sử dụng các thẻ HTML (<h2>, <h3>, <ul>, <li>, <p>) và Tailwind CSS (ví 
                 <p id="cand-score" class="text-5xl font-black text-indigo-700">--</p>
             </div>
             <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-6 text-center shadow-sm">
-                <p class="text-sm font-bold text-emerald-500 uppercase tracking-wider mb-2">Trạng Thái</p>
-                <p id="cand-status" class="text-3xl font-black mt-2">--</p>
+                <p class="text-sm font-bold text-emerald-500 uppercase tracking-wider mb-2">Trạng Thái Kết Luận</p>
+                <p id="cand-status" class="text-4xl font-black mt-2">--</p>
             </div>
         </div>
 
         <div class="bg-white border-t-2 border-gray-100 pt-8">
-            <div id="cand-report" class="prose max-w-none w-full text-gray-700"></div>
+            <div id="cand-report" class="prose max-w-none w-full text-gray-800"></div>
         </div>
     </div>
 
@@ -1006,7 +1003,8 @@ Sử dụng các thẻ HTML (<h2>, <h3>, <ul>, <li>, <p>) và Tailwind CSS (ví 
             data.forEach((c, i) => {
                 let opt = document.createElement('option');
                 opt.value = i;
-                opt.textContent = \`[\${c.score} Điểm] - \${c.name}\`;
+                let scoreText = c.score !== "N/A" ? c.score + "/10" : "N/A";
+                opt.textContent = \`[\${scoreText}] - \${c.name} - \${c.status}\`;
                 select.appendChild(opt);
             });
             showReport();
@@ -1016,16 +1014,16 @@ Sử dụng các thẻ HTML (<h2>, <h3>, <ul>, <li>, <p>) và Tailwind CSS (ví 
             const idx = document.getElementById('cand-select').value;
             if(idx === "") return;
             const c = data[idx];
-            document.getElementById('cand-score').innerText = c.score;
+            document.getElementById('cand-score').innerText = c.score !== "N/A" ? c.score + "/10" : "N/A";
             
             const statusEl = document.getElementById('cand-status');
             statusEl.innerText = c.status;
-            if(c.status.toLowerCase().includes('không') || c.status.toLowerCase().includes('lỗi')) {
-                statusEl.className = "text-3xl font-black text-red-600 mt-2";
-            } else if(c.status.toLowerCase().includes('cân nhắc')) {
-                statusEl.className = "text-3xl font-black text-yellow-500 mt-2";
+            if(c.status === "Không đạt") {
+                statusEl.className = "text-4xl font-black text-red-600 mt-2";
+            } else if (c.status === "Đạt") {
+                statusEl.className = "text-4xl font-black text-emerald-600 mt-2";
             } else {
-                statusEl.className = "text-3xl font-black text-emerald-600 mt-2";
+                statusEl.className = "text-4xl font-black text-gray-600 mt-2";
             }
 
             document.getElementById('cand-report').innerHTML = c.htmlReport;
