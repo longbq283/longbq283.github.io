@@ -47,7 +47,7 @@
                 <i class="fas fa-key text-amber-600 text-xl flex-shrink-0"></i>
                 <div>
                     <h3 class="font-bold text-amber-800 text-sm">Cấu hình Gemini API Key</h3>
-                    <p class="text-xs text-amber-700 hidden sm:block">Hỗ trợ định dạng Key mới (AQ...) và cũ (AIzaSy...). Lưu an toàn trong trình duyệt.</p>
+                    <p class="text-xs text-amber-700 hidden sm:block">Hỗ trợ đầy đủ định dạng Key mới (AQ...) và cũ (AIzaSy...). Lưu an toàn trong trình duyệt.</p>
                 </div>
             </div>
             <div class="flex gap-2 w-full sm:w-auto items-center">
@@ -596,11 +596,9 @@
                     
                     let score = "8.0", status = "Cân nhắc", htmlReport = aiResultText;
                     
-                    // Xử lý bóc tách an toàn
                     try {
                         let cleanText = aiResultText.replace(/```html/g, '').replace(/```/g, '').trim();
                         
-                        // Đọc điểm số và trạng thái nếu có
                         if (cleanText.includes('{') && cleanText.includes('}')) {
                             const firstBrace = cleanText.indexOf('{');
                             const lastBrace = cleanText.lastIndexOf('}');
@@ -650,7 +648,7 @@
             }, 1000);
         }
 
-        // HÀM GỌI GEMINI API CHÍNH XÁC THEO CƠ CHẾ CODE CŨ CỦA BẠN (HỖ TRỢ ĐẦY ĐỦ CÁC DẠNG KEY AQ... VÀ AIza...)
+        // --- CƠ CHẾ GỌI API CHUẨN XÁC VỚI CÁC CẶP MODEL HIỆN HÀNH (gemini-2.5-flash / gemini-2.0-flash) ---
         async function callGeminiAI(apiKey, jobTitle, jdObject, cvText) {
             const prompt = `
 Bạn là Giám đốc Nhân sự (CHRO) và Chuyên gia kỹ thuật cấp cao.
@@ -684,32 +682,48 @@ Mỗi câu hỏi PHẢI CÓ 'Gợi ý đáp án kỳ vọng' và 'Thang điểm 
 Dùng các thẻ HTML <h2>, <h3>, <ul>, <li>, <p> và Tailwind CSS inline classes (ví dụ class='text-xl font-bold text-gray-800 mb-4') để trang trí đẹp mắt. Dùng dấu nháy đơn (') cho thuộc tính HTML.
 `;
 
-            // Tự động phân nhánh linh hoạt như code cũ của bạn
-            let url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`;
-            let headers = { 'Content-Type': 'application/json' };
+            // THAY THẾ 100% HOÀN TOÀN gemini-1.5-flash THÀNH CÁC MODEL THẾ HỆ MỚI ĐÃ ĐƯỢC KÍCH HOẠT
+            const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash"];
+            let lastError = null;
 
-            if (apiKey.startsWith('AIzaSy')) {
-                url += `?key=${apiKey}`;
-            } else {
-                headers['x-goog-api-key'] = apiKey;
+            for (let modelName of modelsToTry) {
+                let url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
+                let headers = { 'Content-Type': 'application/json' };
+
+                if (apiKey.startsWith('AIzaSy')) {
+                    url += `?key=${apiKey}`;
+                } else {
+                    headers['x-goog-api-key'] = apiKey;
+                }
+
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: headers,
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }],
+                            generationConfig: { temperature: 0.2 }
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.error) {
+                        lastError = data.error.message;
+                        console.warn(`Model ${modelName} trả về lỗi:`, data.error);
+                        continue; // Thử sang model tiếp theo trong danh sách
+                    }
+
+                    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                        return data.candidates[0].content.parts[0].text;
+                    }
+                } catch (e) {
+                    lastError = e.message;
+                    console.warn(`Không gửi được request tới model ${modelName}:`, e);
+                }
             }
 
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: { temperature: 0.2 }
-                })
-            });
-
-            const data = await response.json();
-
-            if (data.error) {
-                throw new Error(data.error.message);
-            }
-
-            return data.candidates[0].content.parts[0].text;
+            throw new Error(lastError || "Không thể kết nối tới Google Gemini AI. Vui lòng kiểm tra lại Key.");
         }
 
         function renderDashboardDropdown() {
