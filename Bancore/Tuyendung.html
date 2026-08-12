@@ -36,18 +36,18 @@
 
     <header class="bg-white shadow-sm mb-6 text-center py-6 no-print">
         <h1 class="text-3xl font-bold text-gray-800 mb-2">Trình Quản lý Hồ sơ Ứng viên</h1>
-        <p class="text-gray-500">Hệ thống Đánh giá CV tự động - Tự động dò tìm Model AI khả dụng</p>
+        <p class="text-gray-500">Hệ thống Đánh giá CV tự động bám sát JD bằng Gemini AI</p>
     </header>
 
     <div class="max-w-6xl mx-auto px-4 pb-12">
         
-        <!-- CẤU HÌNH API KEY -->
+        <!-- CẤU HÌNH API KEY AN TOÀN -->
         <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 no-print">
             <div class="flex items-center gap-3 w-full sm:w-auto">
                 <i class="fas fa-key text-amber-600 text-xl flex-shrink-0"></i>
                 <div>
                     <h3 class="font-bold text-amber-800 text-sm">Cấu hình Gemini API Key</h3>
-                    <p class="text-xs text-amber-700 hidden sm:block">Hỗ trợ đầy đủ định dạng Key (AQ... hoặc AIzaSy...). Tự động dò Model không bao giờ lỗi.</p>
+                    <p class="text-xs text-amber-700 hidden sm:block">Thuật toán Tự Động Dò Tìm Model (Chống lỗi Not Found).</p>
                 </div>
             </div>
             <div class="flex gap-2 w-full sm:w-auto items-center">
@@ -235,7 +235,7 @@
     </div>
 
     <script>
-        // BỘ DỮ LIỆU CƠ SỞ
+        // BỘ DỮ LIỆU CƠ SỞ (Đã tối ưu chuẩn form)
         const defaultCriteria = {
             "Chuyên viên phân tích nghiệp vụ và kiểm soát chất lượng BA/QC (cấp 1 đến cấp 4) - Nội bộ kết hợp ngoài hệ thống": {
                 "Mô tả công việc": "1. Công tác Phân tích nghiệp vụ (BA): Thực hiện thu thập và phân tích yêu cầu nghiệp vụ liên quan đến hệ thống Core Banking và các hệ thống vệ tinh; tham gia xây dựng tài liệu nghiệp vụ URD (User Requirement Document), RSD (Requirement Specification Document) theo quy định của BIDV. Tư vấn các giải pháp phát triển mới, nâng cấp và tư vấn thiết kế chức năng hệ thống Core Banking, hệ thống khác có liên quan phù hợp. Hỗ trợ kết nối các vấn đề cơ bản giữa các bên nghiệp vụ, kỹ thuật và phát triển phần mềm, truyền tải yêu cầu nghiệp vụ thành các thông số kỹ thuật, chức năng và ràng buộc có thể triển khai. Phân tích yêu cầu, tham số hệ thống để đề xuất khai báo, cấu hình hoặc cập nhật. 2. Công tác kiểm soát chất lượng (QC): Quản lý danh mục yêu cầu và kế hoạch triển khai hệ thống Core Banking theo từng giai đoạn, phiên bản. Xây dựng kịch bản kiểm thử hoặc kiểm thử theo kịch bản có sẵn trên các môi trường SIT (System Integration Test), UAT (User Acceptance Test) cho các yêu cầu chức năng và tham số, phối hợp các kiểm thử hạ tầng, hiệu năng và các thành phần tích hợp. Chuẩn bị hồ sơ đánh giá an toàn thông tin đối với các tính năng mới hoặc thay đổi hệ thống, đảm bảo các sản phẩm và thay đổi được triển khai tuân thủ quy định bảo mật và tiêu chuẩn chất lượng. 3. Công tác Đào tạo, hỗ trợ và xây dựng văn bản chế độ: Xây dựng, cập nhật các văn bản, quy trình nghiệp vụ liên quan đến hệ thống Core Banking. Đào tạo, chuyển giao kiến thức hệ thống Core Banking cho các cán bộ trong toàn hệ thống khi có yêu cầu; hỗ trợ xử lý các tình huống phát sinh mới trong nghiệp vụ. 4. Tham gia các tổ, nhóm đề tài, dự án và thực hiện các nhiệm vụ khác theo phân công của Lãnh đạo Ban.",
@@ -550,13 +550,132 @@
                 return text;
             }
             else if (ext === 'doc') {
-                throw new Error("Trình duyệt không đọc được file .doc cũ. Vui lòng chuyển file sang định dạng .docx hoặc .pdf");
+                throw new Error("Trình duyệt không hỗ trợ đọc file .doc cũ. Xin vui lòng chuyển đổi qua định dạng .docx hoặc .pdf");
             }
             else {
                 throw new Error("Định dạng file không hỗ trợ.");
             }
         }
 
+        // ==========================================
+        // THUẬT TOÁN TỰ ĐỘNG DÒ TÌM MODEL GOOGLE AI
+        // ==========================================
+        async function getValidModelsList(apiKey) {
+            let listUrl = 'https://generativelanguage.googleapis.com/v1beta/models';
+            let headers = { 'Content-Type': 'application/json' };
+
+            if (apiKey.startsWith('AIzaSy')) {
+                listUrl += '?key=' + apiKey;
+            } else {
+                headers['x-goog-api-key'] = apiKey;
+            }
+
+            try {
+                const res = await fetch(listUrl, { headers: headers });
+                const data = await res.json();
+                
+                if (data.error) throw new Error(data.error.message);
+                
+                if (data.models) {
+                    // Lọc những model có hỗ trợ generateContent
+                    let valid = data.models
+                        .filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes('generateContent'))
+                        .map(m => m.name.replace('models/', ''));
+                    
+                    // Sắp xếp thứ tự ưu tiên: Có chữ 'flash' là ngon nhất, sau đó đến 'pro'
+                    valid.sort((a, b) => {
+                        let aScore = a.includes('flash') ? 2 : (a.includes('pro') ? 1 : 0);
+                        let bScore = b.includes('flash') ? 2 : (b.includes('pro') ? 1 : 0);
+                        return bScore - aScore; // Descending
+                    });
+                    
+                    if (valid.length > 0) return valid;
+                }
+            } catch (e) {
+                console.warn("Lỗi không thể tự động lấy danh sách models từ Google:", e);
+            }
+            // Mảng dự phòng cuối cùng nếu hàm tự động dò thất bại
+            return ["gemini-1.5-pro", "gemini-1.5-flash", "gemini-pro"]; 
+        }
+
+        // --- GỌI AI ĐÁNH GIÁ TỪNG ỨNG VIÊN ---
+        async function callGeminiAI(apiKey, jobTitle, jdObject, cvText, validModels) {
+            const prompt = `
+Bạn là Giám đốc Nhân sự (CHRO).
+BẮT BUỘC: Bạn phải so sánh nội dung CV trực tiếp với TỪNG TIÊU CHÍ TRONG JD DƯỚI ĐÂY để cho điểm. Không được đánh giá chung chung!
+
+VỊ TRÍ TUYỂN DỤNG: ${jobTitle}
+CHI TIẾT TIÊU CHÍ (JD):
+- Mô tả công việc: ${jdObject["Mô tả công việc"]}
+- Yêu cầu độ tuổi: ${jdObject["Yêu cầu độ tuổi"]}
+- Trình độ chuyên môn: ${jdObject["Trình độ chuyên môn"]}
+- Ngoại ngữ & Tin học: ${jdObject["Trình độ ngoại ngữ, tin học"]}
+- Kinh nghiệm công tác: ${jdObject["Kinh nghiệm công tác"]}
+- Yêu cầu khác: ${jdObject["Yêu cầu khác"]}
+
+NỘI DUNG CV ỨNG VIÊN:
+${cvText}
+
+BẮT BUỘC TRẢ VỀ DỮ LIỆU ĐỊNH DẠNG JSON HOÀN CHỈNH NHƯ SAU (KHÔNG BỌC TRONG \`\`\`json):
+{
+  "score": "Điểm tổng quan từ 1-10 (ví dụ: 8.5)",
+  "status": "Đạt hoặc Không đạt hoặc Cân nhắc",
+  "htmlReport": "<div class='report-section'>...TOÀN BỘ MÃ HTML BÁO CÁO PHẦN I VÀ PHẦN II...</div>"
+}
+
+NỘI DUNG HTML TRONG 'htmlReport':
+PHẦN I: BÁO CÁO PHÂN TÍCH TỪNG TIÊU CHÍ SO VỚI JD (Nêu rõ ứng viên có/không có gì).
+PHẦN II: BỘ CÂU HỎI PHỎNG VẤN CHUYÊN SÂU (TỪ 5 ĐẾN 10 CÂU HỎI).
+Dựa trên những kinh nghiệm/công nghệ/dự án ứng viên viết trong CV, hãy đặt câu hỏi xoáy sâu kiểm tra nghiệp vụ thực tế.
+Mỗi câu hỏi phải đi kèm 'Gợi ý đáp án kỳ vọng' và 'Thang điểm (1-10)'.
+
+Trang trí bằng thẻ HTML (<h2>, <ul>...) và Tailwind CSS (ví dụ class='font-bold text-gray-800'). Dùng dấu nháy đơn (') cho thuộc tính class.
+`;
+
+            let lastError = null;
+
+            // Chạy thử lần lượt các model hợp lệ mà thuật toán đã lấy được
+            for (let modelName of validModels) {
+                let url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
+                let headers = { 'Content-Type': 'application/json' };
+
+                if (apiKey.startsWith('AIzaSy')) {
+                    url += `?key=${apiKey}`;
+                } else {
+                    headers['x-goog-api-key'] = apiKey;
+                }
+
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: headers,
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }],
+                            generationConfig: { temperature: 0.2 }
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.error) {
+                        lastError = data.error.message;
+                        console.warn(`Model ${modelName} từ chối kết nối:`, data.error);
+                        continue; // Thử sang model tiếp theo
+                    }
+
+                    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                        return data.candidates[0].content.parts[0].text;
+                    }
+                } catch (e) {
+                    lastError = e.message;
+                    console.warn(`Mất mạng hoặc lỗi kết nối ở model ${modelName}:`, e);
+                }
+            }
+
+            throw new Error(lastError || "Tất cả các Model đều từ chối kết nối. Hãy kiểm tra lại cấu hình API Key.");
+        }
+
+        // --- VÒNG LẶP XỬ LÝ THEO LÔ ---
         async function startBatchEvaluation() {
             const apiKey = document.getElementById('api-key-input').value.trim();
             if (!apiKey) {
@@ -568,7 +687,7 @@
             if (!jobCriteria) { alert("Vui lòng chọn JD trước!"); return; }
 
             const btn = document.getElementById('btn-evaluate-batch');
-            btn.innerHTML = '<i class="fas fa-spinner spinner mr-2"></i> Hệ thống đang chạy tự động...';
+            btn.innerHTML = '<i class="fas fa-spinner spinner mr-2"></i> Tự động dò tìm cấu hình AI...';
             btn.disabled = true;
             
             const progressContainer = document.getElementById('batch-progress-container');
@@ -580,6 +699,10 @@
             const total = pendingFiles.length;
             evaluatedCandidates = []; 
 
+            // Lấy danh sách Models hợp lệ ĐÚNG CHO TÀI KHOẢN CỦA BẠN
+            const validModelsList = await getValidModelsList(apiKey);
+            console.log("Danh sách Model sẽ dùng để chạy:", validModelsList);
+
             for (let i = 0; i < total; i++) {
                 const currentFile = pendingFiles[i];
                 
@@ -590,9 +713,9 @@
 
                 try {
                     const cvText = await extractTextFromFile(currentFile);
-                    const aiResultText = await callGeminiAI(apiKey, selectedJob, jobCriteria, cvText);
+                    const aiResultText = await callGeminiAI(apiKey, selectedJob, jobCriteria, cvText, validModelsList);
                     
-                    let score = "8.0", status = "Cân nhắc", htmlReport = aiResultText;
+                    let score = "N/A", status = "Cân nhắc", htmlReport = aiResultText;
                     
                     try {
                         let cleanText = aiResultText.replace(/```html/g, '').replace(/```/g, '').trim();
@@ -601,7 +724,7 @@
                             const lastBrace = cleanText.lastIndexOf('}');
                             const jsonSub = cleanText.substring(firstBrace, lastBrace + 1);
                             const parsed = JSON.parse(jsonSub);
-                            score = parsed.score || "8.0";
+                            score = parsed.score || "N/A";
                             status = parsed.status || "Đạt";
                             htmlReport = parsed.htmlReport || cleanText;
                         } else {
@@ -640,126 +763,12 @@
             setTimeout(() => {
                 clearBatch();
                 progressContainer.classList.add('hidden');
-                btn.innerHTML = '<i class="fas fa-robot mr-2"></i> Bắt đầu Quét Đánh Giá Lô';
+                btn.innerHTML = '<i class="fas fa-robot mr-2"></i> Bắt đầu Quét Đánh Giá Lô CV';
                 switchTab('dashboard-tab'); 
             }, 1000);
         }
 
-        // --- CƠ CHẾ DÒ TÌM MÔ HÌNH TỰ ĐỘNG ĐỂ CHỐNG LỖI CỐ ĐỊNH MODEL ---
-        async function fetchAvailableModels(apiKey) {
-            let listUrl = `https://generativelanguage.googleapis.com/v1beta/models`;
-            let headers = { 'Content-Type': 'application/json' };
-
-            if (apiKey.startsWith('AIzaSy')) {
-                listUrl += `?key=${apiKey}`;
-            } else {
-                headers['x-goog-api-key'] = apiKey;
-            }
-
-            try {
-                const response = await fetch(listUrl, { method: 'GET', headers: headers });
-                const data = await response.json();
-                
-                if (data.models && data.models.length > 0) {
-                    // Lọc lấy danh sách các model có hỗ trợ sinh văn bản (generateContent)
-                    const validModels = data.models
-                        .filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes('generateContent'))
-                        .map(m => m.name.replace('models/', ''));
-
-                    // Ưu tiên chọn các model dòng Flash/Pro mới nhất
-                    const preferredKeywords = ['2.5-flash', '3.0-flash', '3.5-flash', '2.0-flash', 'flash', 'pro'];
-                    for (let kw of preferredKeywords) {
-                        const matched = validModels.find(m => m.toLowerCase().includes(kw));
-                        if (matched) return matched;
-                    }
-                    if (validModels.length > 0) return validModels[0];
-                }
-            } catch (e) {
-                console.warn("Không thể lấy tự động danh sách Models, chuyển sang danh sách dự phòng:", e);
-            }
-            return null;
-        }
-
-        async function callGeminiAI(apiKey, jobTitle, jdObject, cvText) {
-            const prompt = `
-Bạn là Giám đốc Nhân sự (CHRO) và Chuyên gia kỹ thuật cấp cao.
-Nhiệm vụ của bạn là soi chiếu CỰC KỲ KHẮT KHE hồ sơ CV của ứng viên so với các tiêu chí trong JD dưới đây.
-
-VỊ TRÍ TUYỂN DỤNG: ${jobTitle}
-CHI TIẾT TIÊU CHÍ (JD):
-- Mô tả công việc: ${jdObject["Mô tả công việc"]}
-- Yêu cầu độ tuổi: ${jdObject["Yêu cầu độ tuổi"]}
-- Trình độ chuyên môn: ${jdObject["Trình độ chuyên môn"]}
-- Ngoại ngữ & Tin học: ${jdObject["Trình độ ngoại ngữ, tin học"]}
-- Kinh nghiệm công tác: ${jdObject["Kinh nghiệm công tác"]}
-- Yêu cầu khác: ${jdObject["Yêu cầu khác"]}
-
-NỘI DUNG CV ỨNG VIÊN:
-${cvText}
-
-BẮT BUỘC TRẢ VỀ DỮ LIỆU ĐỊNH DẠNG JSON HOÀN CHỈNH TƯƠNG TỰ BẢNG DƯỚI ĐÂY (KHÔNG DÙNG BLOCK CODE \`\`\`json):
-{
-  "score": "Điểm tổng quan từ 1-10 (ví dụ: 8.5)",
-  "status": "Đạt hoặc Không đạt hoặc Cân nhắc",
-  "htmlReport": "<div class='report-section'>...TOÀN BỘ MÃ HTML BÁO CÁO MÔ TẢ ĐẦY ĐỦ PHẦN I VÀ PHẦN II...</div>"
-}
-
-NỘI DUNG HTML TRONG 'htmlReport':
-PHẦN I: BÁO CÁO PHÂN TÍCH CHI TIẾT TỪNG TIÊU CHÍ (Chỉ rõ điểm đạt/chưa đạt so với JD).
-PHẦN II: BỘ CÂU HỎI PHỎNG VẤN CHUYÊN SÂU (BẮT BUỘC TỪ 5 TỚI 10 CÂU HỎI).
-Soi chiếu trực tiếp các dự án, công nghệ ứng viên ghi trong CV kết hợp với kiến thức chuyên môn của vị trí để hỏi xoáy sâu.
-Mỗi câu hỏi PHẢI CÓ 'Gợi ý đáp án kỳ vọng' và 'Thang điểm (1-10)'.
-
-Dùng các thẻ HTML <h2>, <h3>, <ul>, <li>, <p> và Tailwind CSS inline classes (ví dụ class='text-xl font-bold text-gray-800 mb-4') để trang trí đẹp mắt. Dùng dấu nháy đơn (') cho thuộc tính HTML.
-`;
-
-            // BƯỚC 1: DÒ TÌM MODEL TỰ ĐỘNG KHẢ DỤNG TRONG TÀI KHOẢN CỦA BẠN
-            let dynamicModel = await fetchAvailableModels(apiKey);
-            
-            // DANH SÁCH DỰ PHÒNG TỰ ĐỘNG
-            const modelsToTry = dynamicModel ? [dynamicModel, "gemini-2.5-flash", "gemini-2.0-flash"] : ["gemini-2.5-flash", "gemini-2.0-flash"];
-            let lastError = null;
-
-            for (let modelName of modelsToTry) {
-                let url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
-                let headers = { 'Content-Type': 'application/json' };
-
-                if (apiKey.startsWith('AIzaSy')) {
-                    url += `?key=${apiKey}`;
-                } else {
-                    headers['x-goog-api-key'] = apiKey;
-                }
-
-                try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: headers,
-                        body: JSON.stringify({
-                            contents: [{ parts: [{ text: prompt }] }],
-                            generationConfig: { temperature: 0.2 }
-                        })
-                    });
-
-                    const data = await response.json();
-
-                    if (data.error) {
-                        lastError = data.error.message;
-                        console.warn(`Model ${modelName} trả về lỗi:`, data.error);
-                        continue;
-                    }
-
-                    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-                        return data.candidates[0].content.parts[0].text;
-                    }
-                } catch (e) {
-                    lastError = e.message;
-                    console.warn(`Không gửi được request tới model ${modelName}:`, e);
-                }
-            }
-
-            throw new Error(lastError || "Không thể kết nối tới Google Gemini AI. Vui lòng kiểm tra lại Key.");
-        }
-
+        // --- DASHBOARD RENDER ---
         function renderDashboardDropdown() {
             const dd = document.getElementById('evaluated-candidate-select');
             dd.innerHTML = '';
