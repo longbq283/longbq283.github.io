@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Các thư viện bóc tách dữ liệu đa định dạng -->
+    <!-- Thư viện bóc tách dữ liệu đa định dạng -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
     <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js';</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
@@ -35,23 +35,23 @@
 <body class="text-gray-800">
 
     <header class="bg-white shadow-sm mb-6 text-center py-6 no-print">
-        <h1 class="text-3xl font-bold text-gray-800 mb-2">Hệ Thống Đánh Giá Hồ Sơ AI</h1>
-        <p class="text-gray-500">Tự động phân tích theo lô (PDF, DOCX, EXCEL) & Quản lý JD thông minh</p>
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Trình Quản lý Hồ sơ Ứng viên</h1>
+        <p class="text-gray-500">Hệ thống Đánh giá CV tự động bám sát JD bằng Gemini AI</p>
     </header>
 
     <div class="max-w-6xl mx-auto px-4 pb-12">
         
-        <!-- CẤU HÌNH API KEY -->
+        <!-- CẤU HÌNH API KEY AN TOÀN -->
         <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 no-print">
             <div class="flex items-center gap-3 w-full sm:w-auto">
                 <i class="fas fa-key text-amber-600 text-xl flex-shrink-0"></i>
                 <div>
                     <h3 class="font-bold text-amber-800 text-sm">Cấu hình Gemini API Key</h3>
-                    <p class="text-xs text-amber-700 hidden sm:block">Dán API Key nhận từ Google AI Studio tại đây.</p>
+                    <p class="text-xs text-amber-700 hidden sm:block">Hỗ trợ định dạng Key mới (AQ...) và cũ (AIzaSy...). Lưu an toàn trong trình duyệt.</p>
                 </div>
             </div>
             <div class="flex gap-2 w-full sm:w-auto items-center">
-                <input type="password" id="api-key-input" class="border border-amber-300 rounded px-3 py-1.5 text-sm w-full sm:w-64 focus:outline-none focus:border-amber-500" placeholder="Dán API Key tại đây...">
+                <input type="password" id="api-key-input" class="border border-amber-300 rounded px-3 py-1.5 text-sm w-full sm:w-64 focus:outline-none focus:border-amber-500" placeholder="Dán Gemini API Key tại đây...">
                 <button onclick="saveApiKey()" class="bg-amber-600 hover:bg-amber-700 text-white font-semibold text-sm px-4 py-1.5 rounded transition whitespace-nowrap flex-shrink-0">Lưu Key</button>
             </div>
         </div>
@@ -65,7 +65,7 @@
                 <i class="fas fa-chart-pie mr-2"></i>2. Báo Cáo Ứng Viên
             </button>
             <button onclick="switchTab('jd-tab')" id="btn-jd-tab" class="tab-inactive flex-1 px-4 py-4 transition-colors duration-200 focus:outline-none whitespace-nowrap text-center">
-                <i class="fas fa-briefcase mr-2"></i>3. Quản lý Yêu Cầu (JD)
+                <i class="fas fa-sliders-h mr-2"></i>3. Quản lý Yêu Cầu (JD)
             </button>
         </div>
 
@@ -74,20 +74,20 @@
             <h2 class="text-xl font-bold text-gray-700 mb-6 border-b pb-4">Tải Lô CV và Phân tích tự động</h2>
             
             <div class="mb-6">
-                <label class="block text-gray-700 text-sm font-semibold mb-2">Chọn vị trí ứng tuyển (JD) để làm chuẩn đối chiếu:</label>
+                <label class="block text-gray-700 text-sm font-semibold mb-2">Chọn vị trí ứng tuyển (JD) để đối chiếu:</label>
                 <select id="candidate-job-select" class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:border-blue-500 bg-gray-50 font-medium">
                     <!-- Danh sách JD -->
                 </select>
             </div>
 
             <div class="bg-blue-50 p-6 rounded-lg border border-blue-100 mb-8">
-                <label class="block text-sm font-semibold text-gray-800 mb-2">Chọn các file CV (Hỗ trợ định dạng: PDF, DOCX, XLSX, XLS):</label>
+                <label class="block text-sm font-semibold text-gray-800 mb-2">Chọn các file CV (Hỗ trợ: PDF, DOCX, XLSX):</label>
                 <div class="flex items-center justify-center w-full mb-4">
                     <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-blue-400 rounded-lg cursor-pointer bg-white hover:bg-blue-50 transition">
                         <div class="flex flex-col items-center justify-center pt-4 pb-4 text-gray-500">
                             <i class="fas fa-file-upload text-3xl mb-2 text-blue-500"></i>
                             <p class="mb-1 text-sm font-semibold text-blue-700">Click để chọn nhiều file CV cùng lúc</p>
-                            <p class="text-xs text-gray-400">PDF, DOCX, EXCEL (Quét theo lô)</p>
+                            <p class="text-xs text-gray-400">Hỗ trợ PDF, DOCX, EXCEL (Quét theo lô)</p>
                         </div>
                         <input type="file" id="cv-upload-batch" class="hidden" accept=".pdf,.doc,.docx,.xls,.xlsx" multiple onchange="handleBatchFileSelect(event)" />
                     </label>
@@ -103,7 +103,7 @@
 
                 <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
                     <button id="btn-evaluate-batch" onclick="startBatchEvaluation()" disabled class="w-full sm:w-auto bg-purple-600 disabled:bg-gray-400 hover:bg-purple-700 text-white font-bold py-3 px-10 rounded-md transition shadow-md whitespace-nowrap">
-                        <i class="fas fa-robot mr-2"></i> Bắt đầu Quét Đánh Giá
+                        <i class="fas fa-robot mr-2"></i> Bắt đầu Quét Đánh Giá Lô
                     </button>
                     <button onclick="clearBatch()" class="text-gray-500 hover:text-red-500 text-sm font-medium transition">
                         <i class="fas fa-trash-alt mr-1"></i> Xóa danh sách
@@ -184,7 +184,6 @@
                     </select>
                 </div>
                 <div class="flex items-end">
-                    <!-- Nút upload file JD -->
                     <label class="flex items-center justify-center w-full h-[46px] border-2 border-blue-500 text-blue-600 rounded-md cursor-pointer hover:bg-blue-50 transition font-bold text-sm">
                         <i class="fas fa-file-import mr-2"></i> Tải file JD (PDF/DOCX) lên
                         <input type="file" class="hidden" accept=".pdf,.doc,.docx" onchange="extractTextFromJDPDF(event)" />
@@ -198,7 +197,7 @@
                     <input type="text" id="jd-title" class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:border-blue-500 font-bold text-blue-700">
                 </div>
                 <div>
-                    <label class="block text-gray-700 text-sm font-semibold mb-1">Mô tả công việc (Dán nội dung JD vào đây):</label>
+                    <label class="block text-gray-700 text-sm font-semibold mb-1">Mô tả công việc:</label>
                     <textarea id="jd-desc" rows="6" class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:border-blue-500 text-sm"></textarea>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -238,71 +237,71 @@
     </div>
 
     <script>
-        // --- DATA GỐC: BỘ TIÊU CHÍ JD ---
+        // CƠ SỞ DỮ LIỆU JD GỐC CỦA BẠN (9 VỊ TRÍ)
         const defaultCriteria = {
             "Chuyên viên phân tích nghiệp vụ và kiểm soát chất lượng BA/QC (cấp 1 đến cấp 4) - Nội bộ kết hợp ngoài hệ thống": {
                 "Mô tả công việc": "1. Công tác Phân tích nghiệp vụ (BA): Thực hiện thu thập và phân tích yêu cầu nghiệp vụ liên quan đến hệ thống Core Banking và các hệ thống vệ tinh; tham gia xây dựng tài liệu nghiệp vụ URD (User Requirement Document), RSD (Requirement Specification Document) theo quy định của BIDV. Tư vấn các giải pháp phát triển mới, nâng cấp và tư vấn thiết kế chức năng hệ thống Core Banking, hệ thống khác có liên quan phù hợp. Hỗ trợ kết nối các vấn đề cơ bản giữa các bên nghiệp vụ, kỹ thuật và phát triển phần mềm, truyền tải yêu cầu nghiệp vụ thành các thông số kỹ thuật, chức năng và ràng buộc có thể triển khai. Phân tích yêu cầu, tham số hệ thống để đề xuất khai báo, cấu hình hoặc cập nhật. 2. Công tác kiểm soát chất lượng (QC): Quản lý danh mục yêu cầu và kế hoạch triển khai hệ thống Core Banking theo từng giai đoạn, phiên bản. Xây dựng kịch bản kiểm thử hoặc kiểm thử theo kịch bản có sẵn trên các môi trường SIT (System Integration Test), UAT (User Acceptance Test) cho các yêu cầu chức năng và tham số, phối hợp các kiểm thử hạ tầng, hiệu năng và các thành phần tích hợp. Chuẩn bị hồ sơ đánh giá an toàn thông tin đối với các tính năng mới hoặc thay đổi hệ thống, đảm bảo các sản phẩm và thay đổi được triển khai tuân thủ quy định bảo mật và tiêu chuẩn chất lượng. 3. Công tác Đào tạo, hỗ trợ và xây dựng văn bản chế độ: Xây dựng, cập nhật các văn bản, quy trình nghiệp vụ liên quan đến hệ thống Core Banking. Đào tạo, chuyển giao kiến thức hệ thống Core Banking cho các cán bộ trong toàn hệ thống khi có yêu cầu; hỗ trợ xử lý các tình huống phát sinh mới trong nghiệp vụ. 4. Tham gia các tổ, nhóm đề tài, dự án và thực hiện các nhiệm vụ khác theo phân công của Lãnh đạo Ban.",
                 "Yêu cầu độ tuổi": "dưới 35 tuổi tại thời điểm dự tuyển.",
-                "Trình độ chuyên môn": "Tốt nghiệp các trường đại học hệ chính quy, tập trung, dài hạn (bao gồm đại học văn bằng 2, không bao gồm hình thức học liên thông lên đại học) tại các trường đại học trong nước/nước ngoài/liên kết thuộc các ngành đào tạo sau: Công nghệ thông tin; Hệ thống thông tin quản lý, phân tích nghiệp vụ; Tài chính ngân hàng; Quản trị kinh doanh; Kế toán kiểm toán; Kinh tế quốc tế; Và các lĩnh vực có liên quan. Đối với các trường đại học trong nước yêu cầu thuộc danh sách quy định.",
+                "Trình độ chuyên môn": "Tốt nghiệp các trường đại học hệ chính quy, tập trung, dài hạn (bao gồm đại học văn bằng 2, không bao gồm hình thức học liên thông lên đại học) tại các trường đại học trong nước/nước ngoài/liên kết thuộc các ngành đào tạo sau: Công nghệ thông tin; Hệ thống thông tin quản lý, phân tích nghiệp vụ; Tài chính ngân hàng; Quản trị kinh doanh; Kế toán kiểm toán; Kinh tế quốc tế; Và các lĩnh vực có liên quan.",
                 "Trình độ ngoại ngữ, tin học": "Có một trong các chứng chỉ tiếng Anh với số điểm yêu cầu tối thiểu: TOEIC 600, TOEFL CBT 173, TOEFL iBT 61, IELTS 5.5 trở lên. Chấp nhận ứng viên bổ sung chứng chỉ tiếng Anh trong thời gian 24 tháng kể từ ngày được tuyển dụng.",
-                "Kinh nghiệm công tác": "1. Đối với ứng viên ngoài hệ thống: Có kinh nghiệm làm vị trí Phân tích nghiệp vụ (Business Analysis) hoặc tương đương tối thiểu 01 năm trong các lĩnh vực Công nghệ thông tin, Tài chính ngân hàng. Có kiến thức về các sản phẩm, dịch vụ, quy trình trong lĩnh vực ngân hàng, hiểu biết về hệ thống ứng dụng của ngân hàng. Có kinh nghiệm làm việc với các dự án theo quy trình Agile/Scrum. 2. Đối với ứng viên nội bộ: Có kinh nghiệm làm việc tối thiểu 02 năm tại BIDV.",
+                "Kinh nghiệm công tác": "1. Đối với ứng viên ngoài hệ thống: Có kinh nghiệm làm vị trí Phân tích nghiệp vụ (Business Analysis) hoặc tương đương tối thiểu 01 năm trong các lĩnh vực Công nghệ thông tin, Tài chính ngân hàng. Có kiến thức về các sản phẩm, dịch vụ, quy trình trong lĩnh vực ngân hàng. Có kinh nghiệm làm việc với các dự án theo quy trình Agile/Scrum. 2. Đối với ứng viên nội bộ: Có kinh nghiệm làm việc tối thiểu 02 năm tại BIDV.",
                 "Yêu cầu khác": "Có kĩ năng tổng hợp, tư duy phản biện. Kỹ năng sử dụng AI trong công việc. Có kinh nghiệm xây dựng tài liệu URD, RSD; Thành thạo Jira, Confluence, Axure, Visio, Draw.io. Ưu tiên các chứng chỉ IIBA (ECBA, CCBA, CBAP), PMI-PBA, IREB."
             },
             "Chuyên viên cấp cao phân tích nghiệp vụ và kiểm soát chất lượng cấp 1 - Ngoài hệ thống": {
-                "Mô tả công việc": "1. Công tác Phân tích nghiệp vụ (BA): Thực hiện thu thập và phân tích yêu cầu phức tạp và liên kết nhiều nghiệp vụ, lĩnh vực, hệ thống liên quan đến hệ thống Core Banking và các hệ thống có liên quan... Đảm nhiệm các dự án trọng điểm, liên quan đến nhà cung cấp hoặc đối tác chiến lược. 2. Công tác kiểm soát chất lượng (QC): Quản lý danh mục yêu cầu và kế hoạch triển khai. Xây dựng kịch bản kiểm thử SIT, UAT... 3. Công tác Đào tạo và xây dựng văn bản chế độ. 4. Đầu mối phối hợp trong các dự án triển khai có độ ưu tiên cao.",
+                "Mô tả công việc": "1. Công tác Phân tích nghiệp vụ (BA): Thực hiện thu thập và phân tích yêu cầu phức tạp và liên kết nhiều nghiệp vụ, lĩnh vực, hệ thống liên quan đến hệ thống Core Banking... Đảm nhiệm các dự án trọng điểm. 2. Công tác kiểm soát chất lượng (QC): Quản lý danh mục yêu cầu và kế hoạch triển khai. Xây dựng kịch bản kiểm thử SIT, UAT...",
                 "Yêu cầu độ tuổi": "dưới 42 tuổi tại thời điểm dự tuyển.",
                 "Trình độ chuyên môn": "Tốt nghiệp các trường đại học hệ chính quy thuộc khối ngành CNTT, Kinh tế theo danh sách chỉ định.",
                 "Trình độ ngoại ngữ, tin học": "TOEIC 600, TOEFL CBT 173, TOEFL iBT 61, IELTS 5.5 trở lên. Bổ sung trong 24 tháng.",
-                "Kinh nghiệm công tác": "Có kinh nghiệm làm vị trí Phân tích nghiệp vụ (BA), Product Owner (PO) hoặc tương đương tối thiểu 03 năm trong các lĩnh vực CNTT, Tài chính ngân hàng. Am hiểu các nghiệp vụ Thanh toán, Chuyển tiền quốc tế. Kế hoạch Agile/Scrum.",
+                "Kinh nghiệm công tác": "Có kinh nghiệm làm vị trí Phân tích nghiệp vụ (BA), Product Owner (PO) hoặc tương đương tối thiểu 03 năm trong các lĩnh vực CNTT, Tài chính ngân hàng. Am hiểu các nghiệp vụ Thanh toán, Chuyển tiền quốc tế.",
                 "Yêu cầu khác": "Kỹ năng sử dụng AI trong công việc. Thành thạo Jira, Confluence, Axure, Visio. Ưu tiên chứng chỉ IIBA, PMI-PBA, CPRE."
             },
             "Chuyên viên Quản trị hệ thống ứng dụng Core Banking (từ cấp 1 đến cấp 3) - Ngoài hệ thống": {
-                "Mô tả công việc": "Quản trị các cấu phần của hệ thống Core Banking (Web, Application, Database, SSO, tác vụ). Thực hiện chuyển đổi máy chủ HA, diễn tập thảm họa DR, dọn dữ liệu, vá bảo mật. Đánh giá tình trạng, tối ưu hiệu năng xử lý. Điều tra sự cố phần mềm.",
+                "Mô tả công việc": "Quản trị các cấu phần của hệ thống Core Banking (Web, Application, Database, SSO, tác vụ). Thực hiện chuyển đổi máy chủ HA, diễn tập thảm họa DR, dọn dữ liệu, vá bảo mật. Đánh giá tình trạng, tối ưu hiệu năng xử lý.",
                 "Yêu cầu độ tuổi": "không quá 35 tuổi tại thời điểm dự tuyển.",
                 "Trình độ chuyên môn": "Tốt nghiệp ĐH chính quy chuyên ngành Công nghệ thông tin, Điện tử Viễn thông, Toán-Tin, Khoa học máy tính, Kỹ thuật phần mềm...",
                 "Trình độ ngoại ngữ, tin học": "TOEIC 600, TOEFL iBT 61, IELTS 5.5 trở lên. Cho phép nợ 24 tháng.",
                 "Kinh nghiệm công tác": "Tối thiểu 01 năm kinh nghiệm quản trị các hệ thống ứng dụng trong doanh nghiệp. Ưu tiên kinh nghiệm quản trị hệ thống ngân hàng lõi (Core Banking).",
-                "Yêu cầu khác": "Có khả năng quản trị IBM Websphere, IBM Websphere MQ, Apache Tomcat, Oracle Tuxedo, ElasticSearch, Grafana. Hiểu biết HA, DR, Load Balancing. Ưu tiên chứng chỉ AIX Administrator, LPIC, IBM Websphere."
+                "Yêu cầu khác": "Có khả năng quản trị IBM Websphere, IBM Websphere MQ, Apache Tomcat, Oracle Tuxedo, ElasticSearch, Grafana. Hiểu biết HA, DR, Load Balancing."
             },
             "Chuyên viên Quản trị dữ liệu (Cấp 1) - Nội bộ kết hợp ngoài hệ thống": {
-                "Mô tả công việc": "Quản lý, giám sát và tối ưu hệ thống dữ liệu và tham số trên Core Banking. Thiết kế giải pháp thu thập, làm sạch, lưu trữ dữ liệu (ETL). Phát triển báo cáo tự động hóa. Quản lý khai báo tham số ứng dụng Core Banking trên các môi trường.",
+                "Mô tả công việc": "Quản lý, giám sát và tối ưu hệ thống dữ liệu và tham số trên Core Banking. Thiết kế giải pháp thu thập, làm sạch, lưu trữ dữ liệu (ETL). Phát triển báo cáo tự động hóa.",
                 "Yêu cầu độ tuổi": "không quá 30 tuổi tại thời điểm dự tuyển.",
                 "Trình độ chuyên môn": "Tốt nghiệp ĐH chính quy các ngành CNTT, Điện tử viễn thông, Toán-Tin, Khoa học máy tính, An toàn thông tin...",
-                "Trình độ ngoại ngữ, tin học": "TOEIC 600, IELTS 5.5 trở lên (Hoàn thiện trong 24 tháng).",
+                "Trình độ ngoại ngữ, tin học": "TOEIC 600, IELTS 5.5 trở lên.",
                 "Kinh nghiệm công tác": "Tối thiểu 01 năm kinh nghiệm vị trí tương đương. Ưu tiên am hiểu Core Banking Profile, ngôn ngữ Python, R, Big Data.",
-                "Yêu cầu khác": "Kinh nghiệm thực tế CSDL Oracle, SQL Server, DB2, GT.M. Sử dụng công cụ ETL (IBM DataStage, Kafka). Tuning performance câu lệnh SQL."
+                "Yêu cầu khác": "Kinh nghiệm thực tế CSDL Oracle, SQL Server, DB2, GT.M. Sử dụng công cụ ETL (IBM DataStage, Kafka). Tuning performance SQL."
             },
             "Chuyên viên Điều phối dự án (cấp 1) - Nội bộ kết hợp ngoài hệ thống": {
-                "Mô tả công việc": "Hỗ trợ quản lý dự án lập kế hoạch, theo dõi tiến độ công việc qua Jira. Ghi chép biên bản họp, theo dõi action items. Hỗ trợ đánh giá rủi ro, quản lý kho tài liệu dự án, hỗ trợ công tác hành chính nhân sự của dự án.",
+                "Mô tả công việc": "Hỗ trợ quản lý dự án lập kế hoạch, theo dõi tiến độ công việc qua Jira. Ghi chép biên bản họp, theo dõi action items. Hỗ trợ đánh giá rủi ro, quản lý kho tài liệu dự án.",
                 "Yêu cầu độ tuổi": "≤ 35 tuổi tại thời điểm dự tuyển.",
                 "Trình độ chuyên môn": "Tốt nghiệp ĐH chính quy chuyên ngành Kinh tế (Tài chính, Ngân hàng, Kế toán...) hoặc CNTT.",
                 "Trình độ ngoại ngữ, tin học": "TOEIC 600, IELTS 5.5 trở lên.",
                 "Kinh nghiệm công tác": "Đã từng tham gia Quản trị/điều phối dự án CNTT tối thiểu 01 năm.",
-                "Yêu cầu khác": "Am hiểu Agile/Scrum, sử dụng tốt Jira/Confluence. Ưu tiên chứng chỉ PMP/Prince2 hoặc kinh nghiệm dự án Core Banking."
+                "Yêu cầu khác": "Am hiểu Agile/Scrum, sử dụng tốt Jira/Confluence. Ưu tiên chứng chỉ PMP/Prince2."
             },
             "Chuyên viên Đảm bảo chất lượng (cấp 1) - Nội bộ kết hợp ngoài hệ thống": {
-                "Mô tả công việc": "Hỗ trợ xây dựng quy trình phát triển, kiểm thử phần mềm. Quản lý kịch bản kiểm thử (test cases). Ghi nhận và báo cáo bug qua Jira. Giám sát đội phát triển tuân thủ quy trình. Kiểm tra tính tuân thủ của tài liệu đặc tả.",
+                "Mô tả công việc": "Hỗ trợ xây dựng quy trình phát triển, kiểm thử phần mềm. Quản lý kịch bản kiểm thử (test cases). Ghi nhận và báo cáo bug qua Jira. Giám sát đội phát triển tuân thủ quy trình.",
                 "Yêu cầu độ tuổi": "≤ 35 tuổi tại thời điểm dự tuyển.",
                 "Trình độ chuyên môn": "Tốt nghiệp ĐH chính quy chuyên ngành CNTT, Kỹ thuật phần mềm, Hệ thống thông tin...",
                 "Trình độ ngoại ngữ, tin học": "TOEIC 600, IELTS 5.5 trở lên.",
                 "Kinh nghiệm công tác": "Có 01 năm kinh nghiệm ở vị trí tương đương (QA/QC), nắm vững quá trình phát triển phần mềm.",
-                "Yêu cầu khác": "Có kiến thức CMMI, Agile/Scrum, DevSecOps. Khai thác Jira/Confluence. Hiểu biết về Automation Testing, Performance Testing."
+                "Yêu cầu khác": "Có kiến thức CMMI, Agile/Scrum, DevSecOps. Khai thác Jira/Confluence."
             },
             "Chuyên viên phát triển ứng dụng (cấp 1) - Ngoài hệ thống": {
-                "Mô tả công việc": "Lập trình các yêu cầu phát triển phần mềm có liên quan đến Core Banking, thực hiện unit test. Lập trình trên nền tảng Web tác nghiệp. Tối ưu hiệu năng, bảo mật hệ thống. Lập trình xử lý sự cố.",
+                "Mô tả công việc": "Lập trình các yêu cầu phát triển phần mềm có liên quan đến Core Banking, thực hiện unit test. Lập trình trên nền tảng Web tác nghiệp.",
                 "Yêu cầu độ tuổi": "không quá 30 tuổi tại thời điểm dự tuyển.",
                 "Trình độ chuyên môn": "Tốt nghiệp ĐH chính quy nhóm ngành Máy tính và CNTT.",
                 "Trình độ ngoại ngữ, tin học": "TOEIC 600, IELTS 5.5 trở lên.",
                 "Kinh nghiệm công tác": "Có tối thiểu 03 năm kinh nghiệm làm việc với Angular (HTML/CSS/TS) hoặc Spring Boot (Java).",
-                "Yêu cầu khác": "Kinh nghiệm RESTful API, Git/SVN. Ưu tiên kinh nghiệm SQL/NoSQL, kiến trúc Microservices, hệ thống ngân hàng, Figma UI/UX."
+                "Yêu cầu khác": "Kinh nghiệm RESTful API, Git/SVN. Ưu tiên kinh nghiệm SQL/NoSQL, Microservices, Figma UI/UX."
             },
             "Chuyên viên Phát triển API và Tích hợp (Cấp 1) - Ngoài hệ thống": {
-                "Mô tả công việc": "Phát triển các dịch vụ tích hợp, kiểm soát và tối ưu các API phục vụ tích hợp Core Banking. Xây dựng API kết nối backend. Nâng cấp hệ thống tác nghiệp tại quầy. Lập trình xử lý sự cố tích hợp.",
+                "Mô tả công việc": "Phát triển các dịch vụ tích hợp, kiểm soát và tối ưu các API phục vụ tích hợp Core Banking. Xây dựng API kết nối backend.",
                 "Yêu cầu độ tuổi": "không quá 27 tuổi tại thời điểm dự tuyển.",
                 "Trình độ chuyên môn": "Tốt nghiệp ĐH chính quy chuyên ngành CNTT, Điện tử viễn thông... từ các trường trong danh sách quy định.",
                 "Trình độ ngoại ngữ, tin học": "TOEIC 600, IELTS 5.5 trở lên.",
                 "Kinh nghiệm công tác": "Có kinh nghiệm Java, Java EE, lập trình CSDL SQL/NoSQL, thiết kế package/procedure. Thành thạo Git/Gitlab.",
-                "Yêu cầu khác": "Am hiểu sâu về API, IBM Websphere, Spring Boot. Ưu tiên có kinh nghiệm làm dự án Core Banking hoặc hệ thống chịu tải lớn."
+                "Yêu cầu khác": "Am hiểu sâu về API, IBM Websphere, Spring Boot."
             },
             "Chuyên viên Phát triển Core Banking (cấp 1) - Ngoài hệ thống": {
                 "Mô tả công việc": "Lập trình các tính năng, module trong hệ thống Core Banking của BIDV. Lập trình các chức năng tích hợp ngoài Core. Tối ưu hiệu năng, xử lý sự cố Core Banking.",
@@ -318,13 +317,11 @@
         let pendingFiles = []; 
         let evaluatedCandidates = []; 
 
-        // --- KHỞI TẠO ---
         window.onload = function() {
             loadJDsFromStorage();
             loadApiKey();
         };
 
-        // --- HỆ THỐNG QUẢN LÝ TABS ---
         function switchTab(tabId) {
             document.getElementById('upload-tab').classList.add('hidden');
             document.getElementById('dashboard-tab').classList.add('hidden');
@@ -342,15 +339,12 @@
             }
         }
 
-        // --- HỆ THỐNG QUẢN LÝ JD ---
         function loadJDsFromStorage() {
             const stored = localStorage.getItem('app_custom_jds');
             if (stored) {
                 customJDs = JSON.parse(stored);
                 Object.keys(defaultCriteria).forEach(key => {
-                    if (!customJDs[key]) {
-                        customJDs[key] = defaultCriteria[key];
-                    }
+                    if (!customJDs[key]) customJDs[key] = defaultCriteria[key];
                 });
             } else {
                 customJDs = JSON.parse(JSON.stringify(defaultCriteria));
@@ -392,7 +386,7 @@
         }
 
         function createNewJD() {
-            document.getElementById('jd-title').value = "Nhập Tên Vị Trí Mới...";
+            document.getElementById('jd-title').value = "Tên Vị Trí Mới...";
             document.getElementById('jd-desc').value = "";
             document.getElementById('jd-age').value = "";
             document.getElementById('jd-edu').value = "";
@@ -404,7 +398,7 @@
 
         function loadCriteriaToForm() {
             const selectedJob = document.getElementById('jd-job-select').value;
-            if(!selectedJob) return;
+            if(!selectedJob || !customJDs[selectedJob]) return;
             const data = customJDs[selectedJob];
 
             document.getElementById('jd-title').value = selectedJob;
@@ -448,23 +442,21 @@
             }
         }
 
-        // --- ĐỌC FILE TẠI TAB JD (PDF, DOCX) ---
         async function extractTextFromJDPDF(event) {
             const file = event.target.files[0];
             if (!file) return;
             try {
-                document.getElementById('jd-desc').value = "Đang đọc file...";
+                document.getElementById('jd-desc').value = "Đang trích xuất...";
                 const text = await extractTextFromFile(file);
                 document.getElementById('jd-desc').value = text;
-                alert("Đã trích xuất nội dung thành công. Vui lòng chỉnh sửa và phân bổ lại vào các trường cho phù hợp.");
+                alert("Đã trích xuất xong nội dung. Vui lòng bấm 'LƯU JD VÀO HỆ THỐNG' để lưu lại.");
             } catch (error) {
-                alert("Lỗi không thể đọc file.");
+                alert("Lỗi không thể đọc file: " + error.message);
                 document.getElementById('jd-desc').value = "";
             }
             event.target.value = ""; 
         }
 
-        // --- QUẢN LÝ API KEY ---
         function saveApiKey() {
             const key = document.getElementById('api-key-input').value.trim();
             if(key) {
@@ -480,11 +472,9 @@
             if(savedKey) document.getElementById('api-key-input').value = savedKey;
         }
 
-        // --- XỬ LÝ LÔ (BATCH UPLOAD) ---
         function handleBatchFileSelect(event) {
             const files = event.target.files;
             if (files.length === 0) return;
-            
             for(let i=0; i<files.length; i++) {
                 pendingFiles.push(files[i]);
             }
@@ -532,7 +522,6 @@
             renderPendingFiles();
         }
 
-        // HÀM BÓC CHỮ TỪ ĐA ĐỊNH DẠNG (PDF, DOCX, XLSX)
         async function extractTextFromFile(file) {
             const ext = file.name.split('.').pop().toLowerCase();
             
@@ -563,14 +552,13 @@
                 return text;
             }
             else if (ext === 'doc') {
-                throw new Error("Trình duyệt không hỗ trợ đọc file .doc cũ. Vui lòng đổi file sang định dạng .docx hoặc .pdf");
+                throw new Error("Trình duyệt không đọc được file .doc cũ. Vui lòng chuyển file sang định dạng .docx hoặc .pdf");
             }
             else {
                 throw new Error("Định dạng file không hỗ trợ.");
             }
         }
 
-        // --- GỌI AI THEO LÔ ---
         async function startBatchEvaluation() {
             const apiKey = document.getElementById('api-key-input').value.trim();
             if (!apiKey) {
@@ -606,22 +594,25 @@
                     const cvText = await extractTextFromFile(currentFile);
                     const aiResultText = await callGeminiAI(apiKey, selectedJob, jobCriteria, cvText);
                     
-                    // Bóc tách JSON an toàn từ phản hồi text của AI
                     let score = "8.0", status = "Cân nhắc", htmlReport = aiResultText;
+                    
+                    // Xử lý bóc tách an toàn
                     try {
-                        let cleanJsonStr = aiResultText.trim();
-                        if (cleanJsonStr.includes('{') && cleanJsonStr.includes('}')) {
-                            const firstBrace = cleanJsonStr.indexOf('{');
-                            const lastBrace = cleanJsonStr.lastIndexOf('}');
-                            cleanJsonStr = cleanJsonStr.substring(firstBrace, lastBrace + 1);
-                            
-                            const parsedData = JSON.parse(cleanJsonStr);
-                            score = parsedData.score || "8.0";
-                            status = parsedData.status || "Đạt";
-                            htmlReport = parsedData.htmlReport || aiResultText;
+                        let cleanText = aiResultText.replace(/```html/g, '').replace(/```/g, '').trim();
+                        
+                        // Đọc điểm số và trạng thái nếu có
+                        if (cleanText.includes('{') && cleanText.includes('}')) {
+                            const firstBrace = cleanText.indexOf('{');
+                            const lastBrace = cleanText.lastIndexOf('}');
+                            const jsonSub = cleanText.substring(firstBrace, lastBrace + 1);
+                            const parsed = JSON.parse(jsonSub);
+                            score = parsed.score || "8.0";
+                            status = parsed.status || "Đạt";
+                            htmlReport = parsed.htmlReport || cleanText;
+                        } else {
+                            htmlReport = cleanText;
                         }
                     } catch(err) {
-                        console.warn("Không parse được JSON, hiển thị text dạng HTML.", err);
                         htmlReport = aiResultText;
                     }
 
@@ -641,7 +632,6 @@
                         htmlReport: `<div class="p-6 bg-red-50 text-red-600 rounded-lg border border-red-200">
                                         <h3 class="font-bold text-lg mb-2"><i class="fas fa-exclamation-triangle mr-2"></i>Không thể phân tích file này</h3>
                                         <p><strong>Chi tiết lỗi:</strong> ${error.message}</p>
-                                        <p class="text-xs mt-2 text-red-500">Gợi ý: Kiểm tra lại Gemini API Key hoặc đảm bảo file không bị khóa mật khẩu.</p>
                                      </div>`
                     });
                 }
@@ -655,12 +645,12 @@
             setTimeout(() => {
                 clearBatch();
                 progressContainer.classList.add('hidden');
-                btn.innerHTML = '<i class="fas fa-robot mr-2"></i> Bắt đầu Quét Đánh Giá';
+                btn.innerHTML = '<i class="fas fa-robot mr-2"></i> Bắt đầu Quét Đánh Giá Lô';
                 switchTab('dashboard-tab'); 
             }, 1000);
         }
 
-        // --- GIAO TIẾP GEMINI API CHUẨN XÁC ---
+        // HÀM GỌI GEMINI API CHÍNH XÁC THEO CƠ CHẾ CODE CŨ CỦA BẠN (HỖ TRỢ ĐẦY ĐỦ CÁC DẠNG KEY AQ... VÀ AIza...)
         async function callGeminiAI(apiKey, jobTitle, jdObject, cvText) {
             const prompt = `
 Bạn là Giám đốc Nhân sự (CHRO) và Chuyên gia kỹ thuật cấp cao.
@@ -678,56 +668,50 @@ CHI TIẾT TIÊU CHÍ (JD):
 NỘI DUNG CV ỨNG VIÊN:
 ${cvText}
 
-BẮT BUỘC trả về duy nhất 1 chuỗi JSON hoàn chỉnh theo đúng cấu trúc sau (không bọc trong \`\`\`json):
+BẮT BUỘC TRẢ VỀ DỮ LIỆU ĐỊNH DẠNG JSON HOÀN CHỈNH TƯƠNG TỰ BẢNG DƯỚI ĐÂY (KHÔNG DÙNG BLOCK CODE \`\`\`json):
 {
-  "score": "Điểm tổng quan 1-10 (ví dụ: 8.5)",
+  "score": "Điểm tổng quan từ 1-10 (ví dụ: 8.5)",
   "status": "Đạt hoặc Không đạt hoặc Cân nhắc",
-  "htmlReport": "<div class='report-section'>...TOÀN BỘ MÃ HTML BÁO CÁO PHẦN 1 VÀ PHẦN 2...</div>"
+  "htmlReport": "<div class='report-section'>...TOÀN BỘ MÃ HTML BÁO CÁO MÔ TẢ ĐẦY ĐỦ PHẦN I VÀ PHẦN II...</div>"
 }
 
-NỘI DUNG HTML TRONG 'htmlReport' NÊN BỔ SUNG:
-PHẦN 1: BÁO CÁO PHÂN TÍCH TỪNG TIÊU CHÍ (So sánh chi tiết Pass/Fail với JD).
-PHẦN 2: BỘ 5 - 10 CÂU HỎI PHỎNG VẤN XOÁY SÂU (Hỏi chuyên sâu dự án trong CV, thử thách tình huống thực tế nghiệp vụ, kèm gợi ý đáp án và thang điểm).
-Chú ý: Dùng nháy đơn (') cho các thuộc tính HTML style/class để tránh làm vỡ JSON.
+NỘI DUNG HTML TRONG 'htmlReport':
+PHẦN I: BÁO CÁO PHÂN TÍCH CHI TIẾT TỪNG TIÊU CHÍ (Chỉ rõ điểm đạt/chưa đạt so với JD).
+PHẦN II: BỘ CÂU HỎI PHỎNG VẤN CHUYÊN SÂU (BẮT BUỘC TỪ 5 TỚI 10 CÂU HỎI).
+Soi chiếu trực tiếp các dự án, công nghệ ứng viên ghi trong CV kết hợp với kiến thức chuyên môn của vị trí để hỏi xoáy sâu.
+Mỗi câu hỏi PHẢI CÓ 'Gợi ý đáp án kỳ vọng' và 'Thang điểm (1-10)'.
+
+Dùng các thẻ HTML <h2>, <h3>, <ul>, <li>, <p> và Tailwind CSS inline classes (ví dụ class='text-xl font-bold text-gray-800 mb-4') để trang trí đẹp mắt. Dùng dấu nháy đơn (') cho thuộc tính HTML.
 `;
 
-            // Danh sách Model tương thích tốt nhất
-            const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
-            let lastError = null;
+            // Tự động phân nhánh linh hoạt như code cũ của bạn
+            let url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`;
+            let headers = { 'Content-Type': 'application/json' };
 
-            for (let modelName of modelsToTry) {
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-                try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{ parts: [{ text: prompt }] }],
-                            generationConfig: { temperature: 0.2 }
-                        })
-                    });
-
-                    const resJson = await response.json();
-                    
-                    if (resJson.error) {
-                        lastError = resJson.error.message;
-                        console.warn(`Model ${modelName} báo lỗi API:`, resJson.error);
-                        continue;
-                    }
-
-                    if (resJson.candidates && resJson.candidates[0] && resJson.candidates[0].content) {
-                        return resJson.candidates[0].content.parts[0].text;
-                    }
-                } catch (e) {
-                    lastError = e.message;
-                    console.warn(`Không thể gửi request tới ${modelName}:`, e);
-                }
+            if (apiKey.startsWith('AIzaSy')) {
+                url += `?key=${apiKey}`;
+            } else {
+                headers['x-goog-api-key'] = apiKey;
             }
 
-            throw new Error(lastError || "Không thể kết nối tới Google Gemini. Hãy kiểm tra lại kết nối mạng hoặc API Key.");
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: { temperature: 0.2 }
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.error) {
+                throw new Error(data.error.message);
+            }
+
+            return data.candidates[0].content.parts[0].text;
         }
 
-        // --- DASHBOARD RENDER ---
         function renderDashboardDropdown() {
             const dd = document.getElementById('evaluated-candidate-select');
             dd.innerHTML = '';
