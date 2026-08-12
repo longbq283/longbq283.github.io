@@ -36,18 +36,18 @@
 
     <header class="bg-white shadow-sm mb-6 text-center py-6 no-print">
         <h1 class="text-3xl font-bold text-gray-800 mb-2">Trình Quản lý Hồ sơ Ứng viên</h1>
-        <p class="text-gray-500">Hệ thống Đánh giá CV tự động bám sát JD bằng Gemini AI</p>
+        <p class="text-gray-500">Hệ thống Đánh giá CV tự động - Tự động dò tìm Model AI khả dụng</p>
     </header>
 
     <div class="max-w-6xl mx-auto px-4 pb-12">
         
-        <!-- CẤU HÌNH API KEY AN TOÀN -->
+        <!-- CẤU HÌNH API KEY -->
         <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 no-print">
             <div class="flex items-center gap-3 w-full sm:w-auto">
                 <i class="fas fa-key text-amber-600 text-xl flex-shrink-0"></i>
                 <div>
                     <h3 class="font-bold text-amber-800 text-sm">Cấu hình Gemini API Key</h3>
-                    <p class="text-xs text-amber-700 hidden sm:block">Hỗ trợ đầy đủ định dạng Key mới (AQ...) và cũ (AIzaSy...). Lưu an toàn trong trình duyệt.</p>
+                    <p class="text-xs text-amber-700 hidden sm:block">Hỗ trợ đầy đủ định dạng Key (AQ... hoặc AIzaSy...). Tự động dò Model không bao giờ lỗi.</p>
                 </div>
             </div>
             <div class="flex gap-2 w-full sm:w-auto items-center">
@@ -147,7 +147,6 @@
 
                 <!-- KHU VỰC HIỂN THỊ BÁO CÁO (Printable) -->
                 <div id="print-area">
-                    <!-- Tóm tắt chỉ số nhanh -->
                     <div class="grid grid-cols-2 gap-4 mb-6">
                         <div class="bg-indigo-50 border border-indigo-100 rounded-lg p-4 text-center">
                             <p class="text-xs font-bold text-indigo-500 uppercase tracking-wider mb-1">Điểm Đánh Giá AI</p>
@@ -159,7 +158,6 @@
                         </div>
                     </div>
                     
-                    <!-- HTML Report từ AI -->
                     <div id="dashboard-html-report" class="prose max-w-none w-full">
                         <!-- AI HTML here -->
                     </div>
@@ -237,7 +235,7 @@
     </div>
 
     <script>
-        // CƠ SỞ DỮ LIỆU JD GỐC CỦA BẠN (9 VỊ TRÍ)
+        // BỘ DỮ LIỆU CƠ SỞ
         const defaultCriteria = {
             "Chuyên viên phân tích nghiệp vụ và kiểm soát chất lượng BA/QC (cấp 1 đến cấp 4) - Nội bộ kết hợp ngoài hệ thống": {
                 "Mô tả công việc": "1. Công tác Phân tích nghiệp vụ (BA): Thực hiện thu thập và phân tích yêu cầu nghiệp vụ liên quan đến hệ thống Core Banking và các hệ thống vệ tinh; tham gia xây dựng tài liệu nghiệp vụ URD (User Requirement Document), RSD (Requirement Specification Document) theo quy định của BIDV. Tư vấn các giải pháp phát triển mới, nâng cấp và tư vấn thiết kế chức năng hệ thống Core Banking, hệ thống khác có liên quan phù hợp. Hỗ trợ kết nối các vấn đề cơ bản giữa các bên nghiệp vụ, kỹ thuật và phát triển phần mềm, truyền tải yêu cầu nghiệp vụ thành các thông số kỹ thuật, chức năng và ràng buộc có thể triển khai. Phân tích yêu cầu, tham số hệ thống để đề xuất khai báo, cấu hình hoặc cập nhật. 2. Công tác kiểm soát chất lượng (QC): Quản lý danh mục yêu cầu và kế hoạch triển khai hệ thống Core Banking theo từng giai đoạn, phiên bản. Xây dựng kịch bản kiểm thử hoặc kiểm thử theo kịch bản có sẵn trên các môi trường SIT (System Integration Test), UAT (User Acceptance Test) cho các yêu cầu chức năng và tham số, phối hợp các kiểm thử hạ tầng, hiệu năng và các thành phần tích hợp. Chuẩn bị hồ sơ đánh giá an toàn thông tin đối với các tính năng mới hoặc thay đổi hệ thống, đảm bảo các sản phẩm và thay đổi được triển khai tuân thủ quy định bảo mật và tiêu chuẩn chất lượng. 3. Công tác Đào tạo, hỗ trợ và xây dựng văn bản chế độ: Xây dựng, cập nhật các văn bản, quy trình nghiệp vụ liên quan đến hệ thống Core Banking. Đào tạo, chuyển giao kiến thức hệ thống Core Banking cho các cán bộ trong toàn hệ thống khi có yêu cầu; hỗ trợ xử lý các tình huống phát sinh mới trong nghiệp vụ. 4. Tham gia các tổ, nhóm đề tài, dự án và thực hiện các nhiệm vụ khác theo phân công của Lãnh đạo Ban.",
@@ -598,7 +596,6 @@
                     
                     try {
                         let cleanText = aiResultText.replace(/```html/g, '').replace(/```/g, '').trim();
-                        
                         if (cleanText.includes('{') && cleanText.includes('}')) {
                             const firstBrace = cleanText.indexOf('{');
                             const lastBrace = cleanText.lastIndexOf('}');
@@ -648,7 +645,41 @@
             }, 1000);
         }
 
-        // --- CƠ CHẾ GỌI API CHUẨN XÁC VỚI CÁC CẶP MODEL HIỆN HÀNH (gemini-2.5-flash / gemini-2.0-flash) ---
+        // --- CƠ CHẾ DÒ TÌM MÔ HÌNH TỰ ĐỘNG ĐỂ CHỐNG LỖI CỐ ĐỊNH MODEL ---
+        async function fetchAvailableModels(apiKey) {
+            let listUrl = `https://generativelanguage.googleapis.com/v1beta/models`;
+            let headers = { 'Content-Type': 'application/json' };
+
+            if (apiKey.startsWith('AIzaSy')) {
+                listUrl += `?key=${apiKey}`;
+            } else {
+                headers['x-goog-api-key'] = apiKey;
+            }
+
+            try {
+                const response = await fetch(listUrl, { method: 'GET', headers: headers });
+                const data = await response.json();
+                
+                if (data.models && data.models.length > 0) {
+                    // Lọc lấy danh sách các model có hỗ trợ sinh văn bản (generateContent)
+                    const validModels = data.models
+                        .filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes('generateContent'))
+                        .map(m => m.name.replace('models/', ''));
+
+                    // Ưu tiên chọn các model dòng Flash/Pro mới nhất
+                    const preferredKeywords = ['2.5-flash', '3.0-flash', '3.5-flash', '2.0-flash', 'flash', 'pro'];
+                    for (let kw of preferredKeywords) {
+                        const matched = validModels.find(m => m.toLowerCase().includes(kw));
+                        if (matched) return matched;
+                    }
+                    if (validModels.length > 0) return validModels[0];
+                }
+            } catch (e) {
+                console.warn("Không thể lấy tự động danh sách Models, chuyển sang danh sách dự phòng:", e);
+            }
+            return null;
+        }
+
         async function callGeminiAI(apiKey, jobTitle, jdObject, cvText) {
             const prompt = `
 Bạn là Giám đốc Nhân sự (CHRO) và Chuyên gia kỹ thuật cấp cao.
@@ -682,8 +713,11 @@ Mỗi câu hỏi PHẢI CÓ 'Gợi ý đáp án kỳ vọng' và 'Thang điểm 
 Dùng các thẻ HTML <h2>, <h3>, <ul>, <li>, <p> và Tailwind CSS inline classes (ví dụ class='text-xl font-bold text-gray-800 mb-4') để trang trí đẹp mắt. Dùng dấu nháy đơn (') cho thuộc tính HTML.
 `;
 
-            // THAY THẾ 100% HOÀN TOÀN gemini-1.5-flash THÀNH CÁC MODEL THẾ HỆ MỚI ĐÃ ĐƯỢC KÍCH HOẠT
-            const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash"];
+            // BƯỚC 1: DÒ TÌM MODEL TỰ ĐỘNG KHẢ DỤNG TRONG TÀI KHOẢN CỦA BẠN
+            let dynamicModel = await fetchAvailableModels(apiKey);
+            
+            // DANH SÁCH DỰ PHÒNG TỰ ĐỘNG
+            const modelsToTry = dynamicModel ? [dynamicModel, "gemini-2.5-flash", "gemini-2.0-flash"] : ["gemini-2.5-flash", "gemini-2.0-flash"];
             let lastError = null;
 
             for (let modelName of modelsToTry) {
@@ -711,7 +745,7 @@ Dùng các thẻ HTML <h2>, <h3>, <ul>, <li>, <p> và Tailwind CSS inline classe
                     if (data.error) {
                         lastError = data.error.message;
                         console.warn(`Model ${modelName} trả về lỗi:`, data.error);
-                        continue; // Thử sang model tiếp theo trong danh sách
+                        continue;
                     }
 
                     if (data.candidates && data.candidates[0] && data.candidates[0].content) {
