@@ -3,142 +3,216 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trình Quản lý Hồ sơ Ứng viên AI</title>
+    <title>Hệ thống Quản lý Ứng viên AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Nhúng thư viện PDF.js để đọc file CV -->
+    <!-- Nhúng thư viện PDF.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
     <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js';</script>
 
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
-        .tab-active { border-bottom: 2px solid #2563eb; color: #2563eb; font-weight: 600; }
-        .tab-inactive { color: #6b7280; }
-        .tab-inactive:hover { color: #374151; border-bottom: 2px solid #d1d5db; }
+        .tab-active { border-bottom: 3px solid #2563eb; color: #2563eb; font-weight: 700; background-color: #eff6ff; }
+        .tab-inactive { color: #6b7280; font-weight: 500; }
+        .tab-inactive:hover { color: #374151; background-color: #f9fafb; }
         .spinner { animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* Hide scrollbar for tabs */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        @media print {
+            body * { visibility: hidden; }
+            #print-area, #print-area * { visibility: visible; }
+            #print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 20px; }
+            .no-print { display: none !important; }
+        }
     </style>
 </head>
 <body class="text-gray-800">
 
-    <header class="bg-white shadow-sm mb-8 text-center py-6">
-        <h1 class="text-3xl font-bold text-gray-800 mb-2">Trình Quản lý Hồ sơ Ứng viên</h1>
-        <p class="text-gray-500">Hệ thống Đánh giá CV tự động bám sát JD bằng Gemini AI</p>
+    <header class="bg-white shadow-sm mb-6 text-center py-6 no-print">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Hệ Thống Đánh Giá Hồ Sơ AI</h1>
+        <p class="text-gray-500">Tự động phân tích CV theo lô & Sinh câu hỏi phỏng vấn chuyên sâu</p>
     </header>
 
-    <div class="max-w-5xl mx-auto px-4 pb-12">
+    <div class="max-w-6xl mx-auto px-4 pb-12">
         
         <!-- CẤU HÌNH API KEY AN TOÀN -->
-        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 no-print">
             <div class="flex items-center gap-3 w-full sm:w-auto">
                 <i class="fas fa-key text-amber-600 text-xl flex-shrink-0"></i>
                 <div>
                     <h3 class="font-bold text-amber-800 text-sm">Cấu hình Gemini API Key</h3>
-                    <p class="text-xs text-amber-700 hidden sm:block">Hỗ trợ định dạng Key mới (AQ...) và cũ (AIzaSy...).</p>
+                    <p class="text-xs text-amber-700 hidden sm:block">Hỗ trợ đầy đủ các định dạng Key (AQ... hoặc AIza...). Lưu an toàn tại trình duyệt.</p>
                 </div>
             </div>
             <div class="flex gap-2 w-full sm:w-auto items-center">
-                <input type="password" id="api-key-input" class="border border-amber-300 rounded px-3 py-1.5 text-sm w-full sm:w-64 focus:outline-none focus:border-amber-500" placeholder="Dán Gemini API Key tại đây...">
+                <input type="password" id="api-key-input" class="border border-amber-300 rounded px-3 py-1.5 text-sm w-full sm:w-64 focus:outline-none focus:border-amber-500" placeholder="Dán API Key tại đây...">
                 <button onclick="saveApiKey()" class="bg-amber-600 hover:bg-amber-700 text-white font-semibold text-sm px-4 py-1.5 rounded transition whitespace-nowrap flex-shrink-0">Lưu Key</button>
             </div>
         </div>
 
         <!-- Tabs Navigation -->
-        <div class="flex border-b border-gray-200 mb-6 justify-center overflow-x-auto">
-            <button onclick="switchTab('candidate-tab')" id="btn-candidate-tab" class="tab-active px-4 sm:px-6 py-3 transition-colors duration-200 focus:outline-none whitespace-nowrap">
-                <i class="fas fa-user-check mr-2"></i>Đánh giá Ứng viên
+        <div class="flex border-b border-gray-200 mb-6 overflow-x-auto no-scrollbar bg-white rounded-t-lg shadow-sm no-print">
+            <button onclick="switchTab('upload-tab')" id="btn-upload-tab" class="tab-active flex-1 px-4 py-4 transition-colors duration-200 focus:outline-none whitespace-nowrap text-center">
+                <i class="fas fa-layer-group mr-2"></i>1. Chạy Đánh Giá Lô
             </button>
-            <button onclick="switchTab('jd-tab')" id="btn-jd-tab" class="tab-inactive px-4 sm:px-6 py-3 transition-colors duration-200 focus:outline-none whitespace-nowrap">
-                <i class="fas fa-sliders-h mr-2"></i>Quản lý Tiêu chí Tuyển dụng (JD)
+            <button onclick="switchTab('dashboard-tab')" id="btn-dashboard-tab" class="tab-inactive flex-1 px-4 py-4 transition-colors duration-200 focus:outline-none whitespace-nowrap text-center">
+                <i class="fas fa-chart-pie mr-2"></i>2. Báo Cáo Ứng Viên
+            </button>
+            <button onclick="switchTab('jd-tab')" id="btn-jd-tab" class="tab-inactive flex-1 px-4 py-4 transition-colors duration-200 focus:outline-none whitespace-nowrap text-center">
+                <i class="fas fa-briefcase mr-2"></i>3. Quản lý Yêu Cầu (JD)
             </button>
         </div>
 
-        <!-- TAB 1: ỨNG VIÊN -->
-        <div id="candidate-tab" class="bg-white rounded-lg shadow-md p-6 sm:p-8 block">
-            <h2 class="text-xl font-bold text-gray-700 mb-6 border-b pb-4">Tải CV và Đánh giá tự động</h2>
+        <!-- TAB 1: CHẠY ĐÁNH GIÁ LÔ -->
+        <div id="upload-tab" class="bg-white rounded-b-lg shadow-md p-6 sm:p-8 block no-print">
+            <h2 class="text-xl font-bold text-gray-700 mb-6 border-b pb-4">Tải Lô CV và Phân tích tự động</h2>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div>
-                    <label class="block text-gray-700 text-sm font-semibold mb-2">Chọn vị trí ứng tuyển:</label>
-                    <select id="candidate-job-select" class="w-full border border-gray-300 rounded-md p-2.5 focus:outline-none focus:border-blue-500 bg-white font-medium">
-                        <!-- Danh sách vị trí -->
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-gray-700 text-sm font-semibold mb-2">Trạng thái đọc File CV:</label>
-                    <div id="file-status" class="text-sm p-2.5 border border-gray-200 rounded-md bg-gray-50 text-gray-500 truncate">
-                        Chưa chọn file CV
-                    </div>
-                </div>
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-semibold mb-2">Chọn vị trí ứng tuyển (JD) để đối chiếu:</label>
+                <select id="candidate-job-select" class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:border-blue-500 bg-gray-50 font-medium">
+                    <!-- Danh sách JD -->
+                </select>
             </div>
 
             <div class="bg-blue-50 p-6 rounded-lg border border-blue-100 mb-8">
-                <!-- KHU VỰC UPLOAD FILE -->
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-800 mb-2">Chọn file CV ứng viên (Hỗ trợ PDF):</label>
-                    <div class="flex items-center justify-center w-full">
-                        <label class="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed rounded-lg cursor-pointer bg-white border-blue-300 hover:bg-blue-50 transition">
-                            <div class="flex flex-col items-center justify-center pt-4 pb-4 text-gray-500">
-                                <i class="fas fa-cloud-upload-alt text-2xl mb-1 text-blue-500"></i>
-                                <p class="mb-1 text-sm text-center" id="file-name-display"><span class="font-semibold text-blue-600">Click để tải file PDF lên</span></p>
-                            </div>
-                            <input type="file" id="cv-upload" class="hidden" accept=".pdf" onchange="handleFileSelect(event)" />
-                        </label>
-                    </div>
+                <label class="block text-sm font-semibold text-gray-800 mb-2">Chọn các file CV (Có thể chọn nhiều file PDF cùng lúc):</label>
+                <div class="flex items-center justify-center w-full mb-4">
+                    <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-blue-400 rounded-lg cursor-pointer bg-white hover:bg-blue-50 transition">
+                        <div class="flex flex-col items-center justify-center pt-4 pb-4 text-gray-500">
+                            <i class="fas fa-file-pdf text-3xl mb-2 text-blue-500"></i>
+                            <p class="mb-1 text-sm font-semibold text-blue-700">Click để chọn nhiều file PDF CV</p>
+                            <p class="text-xs text-gray-400">Hỗ trợ đẩy theo lô (batch upload)</p>
+                        </div>
+                        <input type="file" id="cv-upload-batch" class="hidden" accept=".pdf" multiple onchange="handleBatchFileSelect(event)" />
+                    </label>
                 </div>
 
-                <!-- PASTE TEXT (Dự phòng) -->
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-800 mb-2">Hoặc xem/chỉnh sửa trực tiếp nội dung văn bản CV trích xuất:</label>
-                    <textarea id="cv-text" rows="5" class="w-full border border-gray-300 rounded p-3 focus:outline-none focus:border-blue-500 text-sm" placeholder="Nội dung chữ trong CV sẽ xuất hiện ở đây sau khi bạn chọn file PDF..."></textarea>
+                <!-- Danh sách file chờ xử lý -->
+                <div id="pending-files-container" class="hidden mb-6">
+                    <h4 class="font-semibold text-sm text-gray-700 mb-2">Danh sách chờ phân tích (<span id="pending-count">0</span>):</h4>
+                    <ul id="pending-files-list" class="bg-white border border-gray-200 rounded-md divide-y divide-gray-100 max-h-48 overflow-y-auto text-sm">
+                        <!-- Items -->
+                    </ul>
                 </div>
 
-                <div class="flex justify-center">
-                    <button id="btn-evaluate" onclick="evaluateWithGemini()" class="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-md transition shadow-md whitespace-nowrap">
-                        <i class="fas fa-magic mr-2"></i> Bắt đầu Đánh giá & Sinh Câu hỏi
+                <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+                    <button id="btn-evaluate-batch" onclick="startBatchEvaluation()" disabled class="w-full sm:w-auto bg-purple-600 disabled:bg-gray-400 hover:bg-purple-700 text-white font-bold py-3 px-10 rounded-md transition shadow-md whitespace-nowrap">
+                        <i class="fas fa-robot mr-2"></i> Bắt đầu Quét Đánh Giá Lô
+                    </button>
+                    <button onclick="clearBatch()" class="text-gray-500 hover:text-red-500 text-sm font-medium transition">
+                        <i class="fas fa-trash-alt mr-1"></i> Xóa danh sách
                     </button>
                 </div>
-            </div>
-
-            <!-- KHU VỰC HIỂN THỊ KẾT QUẢ TỪ AI -->
-            <div id="ai-results" class="hidden mt-10 border-t pt-8 overflow-x-auto"></div>
-            
-            <div id="export-btns" class="hidden justify-end gap-3 mt-6">
-                <button onclick="window.print()" class="bg-blue-600 text-white px-6 py-2 rounded font-semibold hover:bg-blue-700 transition whitespace-nowrap flex-shrink-0">
-                    <i class="fas fa-print mr-2"></i>In Báo Cáo / Xuất PDF
-                </button>
+                
+                <!-- Thanh trạng thái xử lý lô -->
+                <div id="batch-progress-container" class="hidden mt-6">
+                    <div class="flex justify-between text-xs font-semibold text-purple-700 mb-1">
+                        <span id="batch-progress-text">Đang xử lý: 0 / 0</span>
+                        <span id="batch-progress-percent">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div id="batch-progress-bar" class="bg-purple-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- TAB 2: QUẢN LÝ TIÊU CHÍ (JD) -->
-        <div id="jd-tab" class="bg-white rounded-lg shadow-md p-6 sm:p-8 hidden">
-            <h2 class="text-xl font-bold text-gray-700 mb-4 border-b pb-4">Xem & Chỉnh sửa Tiêu chí Tuyển dụng</h2>
+        <!-- TAB 2: DASHBOARD BÁO CÁO CÁ NHÂN -->
+        <div id="dashboard-tab" class="bg-white rounded-b-lg shadow-md p-6 sm:p-8 hidden">
+            <h2 class="text-xl font-bold text-gray-700 mb-6 border-b pb-4 no-print">Kết quả Phân tích Ứng viên</h2>
             
-            <div class="mb-6">
-                <label class="block text-gray-700 font-semibold mb-2">Chọn Vị trí Tuyển dụng để xem Tiêu chí:</label>
-                <select id="jd-job-select" onchange="loadCriteriaToForm()" class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:border-blue-500 bg-gray-50 font-semibold">
-                    <!-- Danh sách vị trí -->
-                </select>
+            <div id="empty-dashboard" class="text-center py-10 text-gray-400 no-print">
+                <i class="fas fa-folder-open text-4xl mb-3"></i>
+                <p>Chưa có dữ liệu ứng viên nào được phân tích.</p>
+                <p class="text-sm mt-1">Vui lòng chạy đánh giá ở tab "Chạy Đánh Giá Lô" trước.</p>
+            </div>
+
+            <div id="data-dashboard" class="hidden">
+                <!-- Dropdown chọn ứng viên để xem chi tiết -->
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-6 flex flex-col sm:flex-row items-center gap-4 no-print">
+                    <label class="font-bold text-gray-700 whitespace-nowrap">Chọn Ứng viên:</label>
+                    <select id="evaluated-candidate-select" onchange="displayCandidateReport()" class="w-full border border-gray-300 rounded-md p-2.5 focus:outline-none focus:border-blue-500 font-semibold text-blue-700">
+                        <!-- Chèn bằng JS -->
+                    </select>
+                    <button onclick="window.print()" class="w-full sm:w-auto bg-gray-800 hover:bg-gray-900 text-white px-5 py-2.5 rounded font-semibold transition whitespace-nowrap flex-shrink-0">
+                        <i class="fas fa-file-pdf mr-2"></i>Xuất PDF Báo Cáo
+                    </button>
+                </div>
+
+                <!-- KHU VỰC HIỂN THỊ BÁO CÁO (Printable) -->
+                <div id="print-area">
+                    <!-- Tóm tắt chỉ số nhanh -->
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-indigo-50 border border-indigo-100 rounded-lg p-4 text-center">
+                            <p class="text-xs font-bold text-indigo-500 uppercase tracking-wider mb-1">Điểm Đánh Giá AI</p>
+                            <p id="dashboard-score" class="text-3xl font-black text-indigo-700">--</p>
+                        </div>
+                        <div class="bg-emerald-50 border border-emerald-100 rounded-lg p-4 text-center">
+                            <p class="text-xs font-bold text-emerald-500 uppercase tracking-wider mb-1">Đề xuất Trạng Thái</p>
+                            <p id="dashboard-status" class="text-2xl font-black text-emerald-700 mt-1">--</p>
+                        </div>
+                    </div>
+                    
+                    <!-- HTML Report từ AI -->
+                    <div id="dashboard-html-report" class="prose max-w-none w-full">
+                        <!-- AI HTML here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: QUẢN LÝ TIÊU CHÍ (JD) -->
+        <div id="jd-tab" class="bg-white rounded-b-lg shadow-md p-6 sm:p-8 hidden no-print">
+            <div class="flex justify-between items-end border-b pb-4 mb-6">
+                <h2 class="text-xl font-bold text-gray-700">Quản lý Tiêu chí Tuyển dụng (JD)</h2>
+                <button onclick="createNewJD()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md font-semibold text-sm transition">
+                    <i class="fas fa-plus mr-1"></i> Tạo JD Mới
+                </button>
+            </div>
+            
+            <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="md:col-span-2">
+                    <label class="block text-gray-700 font-semibold mb-2">Chọn JD hiện có để chỉnh sửa:</label>
+                    <select id="jd-job-select" onchange="loadCriteriaToForm()" class="w-full border border-gray-300 rounded-md p-2.5 focus:outline-none focus:border-blue-500 bg-gray-50 font-semibold">
+                        <!-- Danh sách vị trí -->
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <!-- Tính năng upload file JD dạng PDF để bóc chữ tự động -->
+                    <label class="flex items-center justify-center w-full h-[46px] border border-blue-500 text-blue-600 rounded-md cursor-pointer hover:bg-blue-50 transition font-medium text-sm">
+                        <i class="fas fa-file-import mr-2"></i> Trích xuất từ file PDF
+                        <input type="file" class="hidden" accept=".pdf" onchange="extractTextFromJDPDF(event)" />
+                    </label>
+                </div>
             </div>
 
             <div class="space-y-4 border border-gray-200 rounded-lg p-5 bg-gray-50">
                 <div>
-                    <label class="block text-gray-700 text-sm font-semibold mb-1">Mô tả công việc:</label>
-                    <textarea id="jd-desc" rows="4" class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:border-blue-500 text-sm"></textarea>
+                    <label class="block text-gray-700 text-sm font-semibold mb-1">Tên vị trí tuyển dụng (Tiêu đề JD):</label>
+                    <input type="text" id="jd-title" class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:border-blue-500 font-bold text-blue-700">
                 </div>
                 <div>
-                    <label class="block text-gray-700 text-sm font-semibold mb-1">Yêu cầu độ tuổi:</label>
-                    <input type="text" id="jd-age" class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:border-blue-500 text-sm">
+                    <label class="block text-gray-700 text-sm font-semibold mb-1">Mô tả công việc (Dán nội dung JD vào đây):</label>
+                    <textarea id="jd-desc" rows="6" class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:border-blue-500 text-sm"></textarea>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-semibold mb-1">Yêu cầu độ tuổi:</label>
+                        <input type="text" id="jd-age" class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:border-blue-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-semibold mb-1">Trình độ ngoại ngữ, tin học:</label>
+                        <input type="text" id="jd-lang" class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:border-blue-500 text-sm">
+                    </div>
                 </div>
                 <div>
                     <label class="block text-gray-700 text-sm font-semibold mb-1">Trình độ chuyên môn:</label>
                     <textarea id="jd-edu" rows="3" class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:border-blue-500 text-sm"></textarea>
-                </div>
-                <div>
-                    <label class="block text-gray-700 text-sm font-semibold mb-1">Trình độ ngoại ngữ, tin học:</label>
-                    <textarea id="jd-lang" rows="2" class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:border-blue-500 text-sm"></textarea>
                 </div>
                 <div>
                     <label class="block text-gray-700 text-sm font-semibold mb-1">Kinh nghiệm công tác:</label>
@@ -146,13 +220,16 @@
                 </div>
                 <div>
                     <label class="block text-gray-700 text-sm font-semibold mb-1">Yêu cầu khác:</label>
-                    <textarea id="jd-other" rows="3" class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:border-blue-500 text-sm"></textarea>
+                    <textarea id="jd-other" rows="2" class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:border-blue-500 text-sm"></textarea>
                 </div>
             </div>
             
-            <div class="mt-6 flex justify-end">
-                <button onclick="saveCurrentCriteria()" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition font-semibold whitespace-nowrap flex-shrink-0">
-                    <i class="fas fa-save mr-2"></i> Lưu Thay Đổi
+            <div class="mt-6 flex justify-between">
+                <button onclick="deleteCurrentJD()" class="text-red-500 hover:text-red-700 font-medium text-sm transition">
+                    <i class="fas fa-trash-alt mr-1"></i> Xóa JD này
+                </button>
+                <button onclick="saveCurrentCriteria()" class="bg-blue-600 text-white px-8 py-2.5 rounded-md hover:bg-blue-700 transition font-semibold whitespace-nowrap flex-shrink-0 shadow-sm">
+                    <i class="fas fa-save mr-2"></i> Lưu JD
                 </button>
             </div>
         </div>
@@ -160,89 +237,64 @@
     </div>
 
     <script>
-        // CƠ SỞ DỮ LIỆU TIÊU CHÍ TUYỂN DỤNG
-        const defaultCriteria = {
-            "Chuyên viên phân tích nghiệp vụ và kiểm soát chất lượng BA/QC (cấp 1 đến cấp 4) - Nội bộ kết hợp ngoài hệ thống": {
-                "Mô tả công việc": "1. Công tác Phân tích nghiệp vụ (BA): Thực hiện thu thập và phân tích yêu cầu nghiệp vụ liên quan đến hệ thống Core Banking và các hệ thống vệ tinh; tham gia xây dựng tài liệu nghiệp vụ URD (User Requirement Document), RSD (Requirement Specification Document) theo quy định của BIDV. Tư vấn các giải pháp phát triển mới, nâng cấp và tư vấn thiết kế chức năng hệ thống Core Banking, hệ thống khác có liên quan phù hợp. Hỗ trợ kết nối các vấn đề cơ bản giữa các bên nghiệp vụ, kỹ thuật và phát triển phần mềm, truyền tải yêu cầu nghiệp vụ thành các thông số kỹ thuật, chức năng và ràng buộc có thể triển khai. Phân tích yêu cầu, tham số hệ thống để đề xuất khai báo, cấu hình hoặc cập nhật. 2. Công tác kiểm soát chất lượng (QC): Quản lý danh mục yêu cầu và kế hoạch triển khai hệ thống Core Banking theo từng giai đoạn, phiên bản. Xây dựng kịch bản kiểm thử hoặc kiểm thử theo kịch bản có sẵn trên các môi trường SIT (System Integration Test), UAT (User Acceptance Test) cho các yêu cầu chức năng và tham số, phối hợp các kiểm thử hạ tầng, hiệu năng và các thành phần tích hợp. Chuẩn bị hồ sơ đánh giá an toàn thông tin đối với các tính năng mới hoặc thay đổi hệ thống, đảm bảo các sản phẩm và thay đổi được triển khai tuân thủ quy định bảo mật và tiêu chuẩn chất lượng. 3. Công tác Đào tạo, hỗ trợ và xây dựng văn bản chế độ: Xây dựng, cập nhật các văn bản, quy trình nghiệp vụ liên quan đến hệ thống Core Banking. Đào tạo, chuyển giao kiến thức hệ thống Core Banking cho các cán bộ trong toàn hệ thống khi có yêu cầu; hỗ trợ xử lý các tình huống phát sinh mới trong nghiệp vụ. 4. Tham gia các tổ, nhóm đề tài, dự án và thực hiện các nhiệm vụ khác theo phân công của Lãnh đạo Ban.",
-                "Yêu cầu độ tuổi": "dưới 35 tuổi tại thời điểm dự tuyển.",
-                "Trình độ chuyên môn": "Tốt nghiệp các trường đại học hệ chính quy, tập trung, dài hạn (bao gồm đại học văn bằng 2, không bao gồm hình thức học liên thông lên đại học) tại các trường đại học trong nước/nước ngoài/liên kết thuộc các ngành đào tạo sau: Công nghệ thông tin; Hệ thống thông tin quản lý, phân tích nghiệp vụ; Tài chính ngân hàng; Kế toán kiểm toán; Kinh tế quốc tế; Và các lĩnh vực có liên quan. Đối với các trường đại học trong nước yêu cầu thuộc danh sách quy định.",
-                "Trình độ ngoại ngữ, tin học": "Có một trong các chứng chỉ tiếng Anh với số điểm yêu cầu tối thiểu: TOEIC 600, TOEFL CBT 173, TOEFL iBT 61, IELTS 5.5 trở lên. Chấp nhận ứng viên bổ sung chứng chỉ tiếng Anh trong thời gian 24 tháng kể từ ngày được tuyển dụng.",
-                "Kinh nghiệm công tác": "1. Đối với ứng viên ngoài hệ thống: Có kinh nghiệm làm vị trí Phân tích nghiệp vụ (Business Analysis) hoặc tương đương tối thiểu 01 năm trong các lĩnh vực Công nghệ thông tin, Tài chính ngân hàng. Có kiến thức về các sản phẩm, dịch vụ, quy trình trong lĩnh vực ngân hàng, hiểu biết về hệ thống ứng dụng của ngân hàng. Có kinh nghiệm làm việc với các dự án theo quy trình Agile/Scrum. 2. Đối với ứng viên nội bộ: Có kinh nghiệm làm việc tối thiểu 02 năm tại BIDV.",
-                "Yêu cầu khác": "Có kĩ năng tổng hợp, tư duy phản biện. Kỹ năng sử dụng AI trong công việc. Có kinh nghiệm xây dựng tài liệu URD, RSD; Thành thạo Jira, Confluence, Axure, Visio, Draw.io. Ưu tiên các chứng chỉ IIBA (ECBA, CCBA, CBAP), PMI-PBA, IREB."
-            },
-            "Chuyên viên cấp cao phân tích nghiệp vụ và kiểm soát chất lượng cấp 1 - Ngoài hệ thống": {
-                "Mô tả công việc": "1. Công tác Phân tích nghiệp vụ (BA): Thực hiện thu thập và phân tích yêu cầu phức tạp và liên kết nhiều nghiệp vụ, lĩnh vực, hệ thống liên quan đến hệ thống Core Banking và các hệ thống có liên quan... Đảm nhiệm các dự án trọng điểm, liên quan đến nhà cung cấp hoặc đối tác chiến lược. 2. Công tác kiểm soát chất lượng (QC): Quản lý danh mục yêu cầu và kế hoạch triển khai. Xây dựng kịch bản kiểm thử SIT, UAT... 3. Công tác Đào tạo và xây dựng văn bản chế độ. 4. Đầu mối phối hợp trong các dự án triển khai có độ ưu tiên cao.",
-                "Yêu cầu độ tuổi": "dưới 42 tuổi tại thời điểm dự tuyển.",
-                "Trình độ chuyên môn": "Tốt nghiệp các trường đại học hệ chính quy thuộc khối ngành CNTT, Kinh tế theo danh sách chỉ định.",
-                "Trình độ ngoại ngữ, tin học": "TOEIC 600, TOEFL CBT 173, TOEFL iBT 61, IELTS 5.5 trở lên. Bổ sung trong 24 tháng.",
-                "Kinh nghiệm công tác": "Có kinh nghiệm làm vị trí Phân tích nghiệp vụ (BA), Product Owner (PO) hoặc tương đương tối thiểu 03 năm trong các lĩnh vực CNTT, Tài chính ngân hàng. Am hiểu các nghiệp vụ Thanh toán, Chuyển tiền quốc tế. Kế hoạch Agile/Scrum.",
-                "Yêu cầu khác": "Kỹ năng sử dụng AI trong công việc. Thành thạo Jira, Confluence, Axure, Visio. Ưu tiên chứng chỉ IIBA, PMI-PBA, CPRE."
-            },
-            "Chuyên viên Quản trị hệ thống ứng dụng Core Banking (từ cấp 1 đến cấp 3) - Ngoài hệ thống": {
-                "Mô tả công việc": "Quản trị các cấu phần của hệ thống Core Banking (Web, Application, Database, SSO, tác vụ). Thực hiện chuyển đổi máy chủ HA, diễn tập thảm họa DR, dọn dữ liệu, vá bảo mật. Đánh giá tình trạng, tối ưu hiệu năng xử lý. Điều tra sự cố phần mềm.",
-                "Yêu cầu độ tuổi": "không quá 35 tuổi tại thời điểm dự tuyển.",
-                "Trình độ chuyên môn": "Tốt nghiệp ĐH chính quy chuyên ngành Công nghệ thông tin, Điện tử Viễn thông, Toán-Tin, Khoa học máy tính, Kỹ thuật phần mềm...",
-                "Trình độ ngoại ngữ, tin học": "TOEIC 600, TOEFL iBT 61, IELTS 5.5 trở lên. Cho phép nợ 24 tháng.",
-                "Kinh nghiệm công tác": "Tối thiểu 01 năm kinh nghiệm quản trị các hệ thống ứng dụng trong doanh nghiệp. Ưu tiên kinh nghiệm quản trị hệ thống ngân hàng lõi (Core Banking).",
-                "Yêu cầu khác": "Có khả năng quản trị IBM Websphere, IBM Websphere MQ, Apache Tomcat, Oracle Tuxedo, ElasticSearch, Grafana. Hiểu biết HA, DR, Load Balancing. Ưu tiên chứng chỉ AIX Administrator, LPIC, IBM Websphere."
-            },
-            "Chuyên viên Quản trị dữ liệu (Cấp 1) - Nội bộ kết hợp ngoài hệ thống": {
-                "Mô tả công việc": "Quản lý, giám sát và tối ưu hệ thống dữ liệu và tham số trên Core Banking. Thiết kế giải pháp thu thập, làm sạch, lưu trữ dữ liệu (ETL). Phát triển báo cáo tự động hóa. Quản lý khai báo tham số ứng dụng Core Banking trên các môi trường.",
-                "Yêu cầu độ tuổi": "không quá 30 tuổi tại thời điểm dự tuyển.",
-                "Trình độ chuyên môn": "Tốt nghiệp ĐH chính quy các ngành CNTT, Điện tử viễn thông, Toán-Tin, Khoa học máy tính, An toàn thông tin...",
-                "Trình độ ngoại ngữ, tin học": "TOEIC 600, IELTS 5.5 trở lên (Hoàn thiện trong 24 tháng).",
-                "Kinh nghiệm công tác": "Tối thiểu 01 năm kinh nghiệm vị trí tương đương. Ưu tiên am hiểu Core Banking Profile, ngôn ngữ Python, R, Big Data.",
-                "Yêu cầu khác": "Kinh nghiệm thực tế CSDL Oracle, SQL Server, DB2, GT.M. Sử dụng công cụ ETL (IBM DataStage, Kafka). Tuning performance câu lệnh SQL."
-            },
-            "Chuyên viên Điều phối dự án (cấp 1) - Nội bộ kết hợp ngoài hệ thống": {
-                "Mô tả công việc": "Hỗ trợ quản lý dự án lập kế hoạch, theo dõi tiến độ công việc qua Jira. Ghi chép biên bản họp, theo dõi action items. Hỗ trợ đánh giá rủi ro, quản lý kho tài liệu dự án, hỗ trợ công tác hành chính nhân sự của dự án.",
-                "Yêu cầu độ tuổi": "≤ 35 tuổi tại thời điểm dự tuyển.",
-                "Trình độ chuyên môn": "Tốt nghiệp ĐH chính quy chuyên ngành Kinh tế (Tài chính, Ngân hàng, Kế toán...) hoặc CNTT.",
-                "Trình độ ngoại ngữ, tin học": "TOEIC 600, IELTS 5.5 trở lên.",
-                "Kinh nghiệm công tác": "Đã từng tham gia Quản trị/điều phối dự án CNTT tối thiểu 01 năm.",
-                "Yêu cầu khác": "Am hiểu Agile/Scrum, sử dụng tốt Jira/Confluence. Ưu tiên chứng chỉ PMP/Prince2 hoặc kinh nghiệm dự án Core Banking."
-            },
-            "Chuyên viên Đảm bảo chất lượng (cấp 1) - Nội bộ kết hợp ngoài hệ thống": {
-                "Mô tả công việc": "Hỗ trợ xây dựng quy trình phát triển, kiểm thử phần mềm. Quản lý kịch bản kiểm thử (test cases). Ghi nhận và báo cáo bug qua Jira. Giám sát đội phát triển tuân thủ quy trình. Kiểm tra tính tuân thủ của tài liệu đặc tả.",
-                "Yêu cầu độ tuổi": "≤ 35 tuổi tại thời điểm dự tuyển.",
-                "Trình độ chuyên môn": "Tốt nghiệp ĐH chính quy chuyên ngành CNTT, Kỹ thuật phần mềm, Hệ thống thông tin...",
-                "Trình độ ngoại ngữ, tin học": "TOEIC 600, IELTS 5.5 trở lên.",
-                "Kinh nghiệm công tác": "Có 01 năm kinh nghiệm ở vị trí tương đương (QA/QC), nắm vững quá trình phát triển phần mềm.",
-                "Yêu cầu khác": "Có kiến thức CMMI, Agile/Scrum, DevSecOps. Khai thác Jira/Confluence. Hiểu biết về Automation Testing, Performance Testing."
-            },
-            "Chuyên viên phát triển ứng dụng (cấp 1) - Ngoài hệ thống": {
-                "Mô tả công việc": "Lập trình các yêu cầu phát triển phần mềm có liên quan đến Core Banking, thực hiện unit test. Lập trình trên nền tảng Web tác nghiệp. Tối ưu hiệu năng, bảo mật hệ thống. Lập trình xử lý sự cố.",
-                "Yêu cầu độ tuổi": "không quá 30 tuổi tại thời điểm dự tuyển.",
-                "Trình độ chuyên môn": "Tốt nghiệp ĐH chính quy nhóm ngành Máy tính và CNTT.",
-                "Trình độ ngoại ngữ, tin học": "TOEIC 600, IELTS 5.5 trở lên.",
-                "Kinh nghiệm công tác": "Có tối thiểu 03 năm kinh nghiệm làm việc với Angular (HTML/CSS/TS) hoặc Spring Boot (Java).",
-                "Yêu cầu khác": "Kinh nghiệm RESTful API, Git/SVN. Ưu tiên kinh nghiệm SQL/NoSQL, kiến trúc Microservices, hệ thống ngân hàng, Figma UI/UX."
-            },
-            "Chuyên viên Phát triển API và Tích hợp (Cấp 1) - Ngoài hệ thống": {
-                "Mô tả công việc": "Phát triển các dịch vụ tích hợp, kiểm soát và tối ưu các API phục vụ tích hợp Core Banking. Xây dựng API kết nối backend. Nâng cấp hệ thống tác nghiệp tại quầy. Lập trình xử lý sự cố tích hợp.",
-                "Yêu cầu độ tuổi": "không quá 27 tuổi tại thời điểm dự tuyển.",
-                "Trình độ chuyên môn": "Tốt nghiệp ĐH chính quy chuyên ngành CNTT, Điện tử viễn thông... từ các trường trong danh sách quy định.",
-                "Trình độ ngoại ngữ, tin học": "TOEIC 600, IELTS 5.5 trở lên.",
-                "Kinh nghiệm công tác": "Có kinh nghiệm Java, Java EE, lập trình CSDL SQL/NoSQL, thiết kế package/procedure. Thành thạo Git/Gitlab.",
-                "Yêu cầu khác": "Am hiểu sâu về API, IBM Websphere, Spring Boot. Ưu tiên có kinh nghiệm làm dự án Core Banking hoặc hệ thống chịu tải lớn."
-            },
-            "Chuyên viên Phát triển Core Banking (cấp 1) - Ngoài hệ thống": {
-                "Mô tả công việc": "Lập trình các tính năng, module trong hệ thống Core Banking của BIDV. Lập trình các chức năng tích hợp ngoài Core. Tối ưu hiệu năng, xử lý sự cố Core Banking.",
-                "Yêu cầu độ tuổi": "không quá 27 tuổi tại thời điểm dự tuyển.",
-                "Trình độ chuyên môn": "Tốt nghiệp ĐH chính quy chuyên ngành CNTT thuộc danh sách các trường hàng đầu chỉ định.",
-                "Trình độ ngoại ngữ, tin học": "TOEIC 600, IELTS 5.5 trở lên.",
-                "Kinh nghiệm công tác": "Có kinh nghiệm viết SQL/NoSQL, package/procedure/function trong CSDL. Thuật toán xử lý dữ liệu lớn.",
-                "Yêu cầu khác": "Tư duy logic tốt. Ưu tiên ứng viên có kinh nghiệm phát triển module Core Banking ngân hàng/fintech, Agile/Scrum."
+        // --- DATA BẰNG LƯU TRỮ TRÌNH DUYỆT (LOCALSTORAGE) ---
+        // JD mặc định mẫu cho lần chạy đầu tiên
+        const defaultJDMockup = {
+            "BA/QC - Core Banking Mẫu": {
+                "Mô tả công việc": "Phân tích yêu cầu nghiệp vụ hệ thống Core Banking. Viết URD, RSD. Xây dựng kịch bản kiểm thử SIT, UAT.",
+                "Yêu cầu độ tuổi": "Dưới 35 tuổi.",
+                "Trình độ chuyên môn": "Đại học chính quy nhóm ngành CNTT, Kinh tế.",
+                "Trình độ ngoại ngữ, tin học": "TOEIC 600 hoặc IELTS 5.5",
+                "Kinh nghiệm công tác": "Tối thiểu 1 năm làm BA các dự án Agile/Scrum.",
+                "Yêu cầu khác": "Thành thạo Jira, Confluence, Visio."
             }
         };
 
-        let currentCriteria = JSON.parse(JSON.stringify(defaultCriteria));
+        let customJDs = {};
+        let pendingFiles = []; // Array of File objects
+        let evaluatedCandidates = []; // Array of { name, score, status, html }
 
+        // --- KHỞI TẠO ---
         window.onload = function() {
+            loadJDsFromStorage();
             initJobDropdowns();
             loadApiKey();
             loadCriteriaToForm();
         };
+
+        // --- HỆ THỐNG QUẢN LÝ TABS ---
+        function switchTab(tabId) {
+            document.getElementById('upload-tab').classList.add('hidden');
+            document.getElementById('dashboard-tab').classList.add('hidden');
+            document.getElementById('jd-tab').classList.add('hidden');
+            
+            document.getElementById('btn-upload-tab').className = "tab-inactive flex-1 px-4 py-4 transition-colors duration-200 focus:outline-none whitespace-nowrap text-center";
+            document.getElementById('btn-dashboard-tab').className = "tab-inactive flex-1 px-4 py-4 transition-colors duration-200 focus:outline-none whitespace-nowrap text-center";
+            document.getElementById('btn-jd-tab').className = "tab-inactive flex-1 px-4 py-4 transition-colors duration-200 focus:outline-none whitespace-nowrap text-center";
+            
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById('btn-' + tabId).className = "tab-active flex-1 px-4 py-4 transition-colors duration-200 focus:outline-none whitespace-nowrap text-center";
+            
+            if (tabId === 'dashboard-tab') {
+                renderDashboardDropdown();
+            }
+        }
+
+        // --- HỆ THỐNG QUẢN LÝ JD ---
+        function loadJDsFromStorage() {
+            const stored = localStorage.getItem('app_custom_jds');
+            if (stored) {
+                customJDs = JSON.parse(stored);
+            } else {
+                customJDs = JSON.parse(JSON.stringify(defaultJDMockup));
+                localStorage.setItem('app_custom_jds', JSON.stringify(customJDs));
+            }
+        }
+
+        function saveJDsToStorage() {
+            localStorage.setItem('app_custom_jds', JSON.stringify(customJDs));
+            initJobDropdowns();
+        }
 
         function initJobDropdowns() {
             const candidateSelect = document.getElementById('candidate-job-select');
@@ -250,7 +302,7 @@
             candidateSelect.innerHTML = '';
             jdSelect.innerHTML = '';
 
-            Object.keys(currentCriteria).forEach(jobTitle => {
+            Object.keys(customJDs).forEach(jobTitle => {
                 const opt1 = document.createElement('option');
                 opt1.value = jobTitle;
                 opt1.textContent = jobTitle;
@@ -263,6 +315,88 @@
             });
         }
 
+        function createNewJD() {
+            document.getElementById('jd-title').value = "Nhập Tên Vị Trí Mới...";
+            document.getElementById('jd-desc').value = "";
+            document.getElementById('jd-age').value = "";
+            document.getElementById('jd-edu').value = "";
+            document.getElementById('jd-lang').value = "";
+            document.getElementById('jd-exp').value = "";
+            document.getElementById('jd-other').value = "";
+            document.getElementById('jd-title').focus();
+        }
+
+        function loadCriteriaToForm() {
+            const selectedJob = document.getElementById('jd-job-select').value;
+            if(!selectedJob) return;
+            const data = customJDs[selectedJob];
+
+            document.getElementById('jd-title').value = selectedJob;
+            document.getElementById('jd-desc').value = data["Mô tả công việc"] || '';
+            document.getElementById('jd-age').value = data["Yêu cầu độ tuổi"] || '';
+            document.getElementById('jd-edu').value = data["Trình độ chuyên môn"] || '';
+            document.getElementById('jd-lang').value = data["Trình độ ngoại ngữ, tin học"] || '';
+            document.getElementById('jd-exp').value = data["Kinh nghiệm công tác"] || '';
+            document.getElementById('jd-other').value = data["Yêu cầu khác"] || '';
+        }
+
+        function saveCurrentCriteria() {
+            const title = document.getElementById('jd-title').value.trim();
+            if (!title) { alert("Vui lòng nhập tên vị trí!"); return; }
+
+            // Xóa tên cũ nếu người dùng đổi tên
+            const oldSelectedJob = document.getElementById('jd-job-select').value;
+            if (oldSelectedJob && oldSelectedJob !== title && customJDs[oldSelectedJob]) {
+                delete customJDs[oldSelectedJob];
+            }
+
+            customJDs[title] = {
+                "Mô tả công việc": document.getElementById('jd-desc').value,
+                "Yêu cầu độ tuổi": document.getElementById('jd-age').value,
+                "Trình độ chuyên môn": document.getElementById('jd-edu').value,
+                "Trình độ ngoại ngữ, tin học": document.getElementById('jd-lang').value,
+                "Kinh nghiệm công tác": document.getElementById('jd-exp').value,
+                "Yêu cầu khác": document.getElementById('jd-other').value
+            };
+            saveJDsToStorage();
+            document.getElementById('jd-job-select').value = title;
+            alert(`Đã lưu thành công JD:\n"${title}"`);
+        }
+
+        function deleteCurrentJD() {
+            const selectedJob = document.getElementById('jd-job-select').value;
+            if(!selectedJob) return;
+            if (confirm(`Bạn có chắc muốn xóa vĩnh viễn JD "${selectedJob}" không?`)) {
+                delete customJDs[selectedJob];
+                saveJDsToStorage();
+                loadCriteriaToForm();
+            }
+        }
+
+        // Bóc chữ từ PDF dán thẳng vào JD Description
+        async function extractTextFromJDPDF(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            try {
+                document.getElementById('jd-desc').value = "Đang đọc file PDF...";
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+                let text = '';
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const content = await page.getTextContent();
+                    text += content.items.map(item => item.str).join(' ') + '\n';
+                }
+                document.getElementById('jd-desc').value = text;
+                alert("Đã trích xuất nội dung JD từ file thành công. Bạn có thể chỉnh sửa lại cho gọn gàng.");
+            } catch (error) {
+                alert("Lỗi không thể đọc file PDF.");
+                document.getElementById('jd-desc').value = "";
+            }
+        }
+
+
+        // --- QUẢN LÝ API KEY ---
         function saveApiKey() {
             const key = document.getElementById('api-key-input').value.trim();
             if(key) {
@@ -273,231 +407,258 @@
                 alert('Đã xóa API Key.');
             }
         }
-
         function loadApiKey() {
             const savedKey = localStorage.getItem('gemini_api_key');
-            if(savedKey) {
-                document.getElementById('api-key-input').value = savedKey;
-            }
+            if(savedKey) document.getElementById('api-key-input').value = savedKey;
         }
 
-        function loadCriteriaToForm() {
-            const selectedJob = document.getElementById('jd-job-select').value;
-            const data = currentCriteria[selectedJob];
 
-            if(data) {
-                document.getElementById('jd-desc').value = data["Mô tả công việc"] || '';
-                document.getElementById('jd-age').value = data["Yêu cầu độ tuổi"] || '';
-                document.getElementById('jd-edu').value = data["Trình độ chuyên môn"] || '';
-                document.getElementById('jd-lang').value = data["Trình độ ngoại ngữ, tin học"] || '';
-                document.getElementById('jd-exp').value = data["Kinh nghiệm công tác"] || '';
-                document.getElementById('jd-other').value = data["Yêu cầu khác"] || '';
-            }
-        }
-
-        function saveCurrentCriteria() {
-            const selectedJob = document.getElementById('jd-job-select').value;
-            currentCriteria[selectedJob] = {
-                "Mô tả công việc": document.getElementById('jd-desc').value,
-                "Yêu cầu độ tuổi": document.getElementById('jd-age').value,
-                "Trình độ chuyên môn": document.getElementById('jd-edu').value,
-                "Trình độ ngoại ngữ, tin học": document.getElementById('jd-lang').value,
-                "Kinh nghiệm công tác": document.getElementById('jd-exp').value,
-                "Yêu cầu khác": document.getElementById('jd-other').value
-            };
-            alert(`Đã lưu cập nhật tiêu chí cho vị trí:\n"${selectedJob}"`);
-        }
-
-        function switchTab(tabId) {
-            document.getElementById('jd-tab').classList.add('hidden');
-            document.getElementById('candidate-tab').classList.add('hidden');
-            document.getElementById('btn-jd-tab').className = "tab-inactive px-4 sm:px-6 py-3 transition-colors duration-200 focus:outline-none whitespace-nowrap";
-            document.getElementById('btn-candidate-tab').className = "tab-inactive px-4 sm:px-6 py-3 transition-colors duration-200 focus:outline-none whitespace-nowrap";
+        // --- LUỒNG XỬ LÝ LÔ (BATCH PROCESSING) ---
+        function handleBatchFileSelect(event) {
+            const files = event.target.files;
+            if (files.length === 0) return;
             
-            document.getElementById(tabId).classList.remove('hidden');
-            document.getElementById('btn-' + tabId).className = "tab-active px-4 sm:px-6 py-3 transition-colors duration-200 focus:outline-none whitespace-nowrap";
-        }
-
-        async function handleFileSelect(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            document.getElementById('file-name-display').innerHTML = `<span class="text-green-600 font-semibold"><i class="fas fa-check-circle mr-1"></i> File: ${file.name}</span>`;
-            document.getElementById('file-status').innerHTML = `<span class="text-blue-600 font-semibold"><i class="fas fa-spinner spinner mr-1"></i> Đang đọc chữ từ PDF...</span>`;
-            document.getElementById('cv-text').value = "Đang trích xuất văn bản từ file PDF...";
-
-            try {
-                const arrayBuffer = await file.arrayBuffer();
-                const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-                let text = '';
-                for (let i = 1; i <= pdf.numPages; i++) {
-                    const page = await pdf.getPage(i);
-                    const content = await page.getTextContent();
-                    text += content.items.map(item => item.str).join(' ') + '\n';
-                }
-                document.getElementById('cv-text').value = text;
-                document.getElementById('file-status').innerHTML = `<span class="text-green-600 font-semibold"><i class="fas fa-check mr-1"></i> Trích xuất thành công (${pdf.numPages} trang)</span>`;
-            } catch (error) {
-                console.error(error);
-                document.getElementById('file-status').innerHTML = `<span class="text-red-600 font-semibold"><i class="fas fa-exclamation-triangle mr-1"></i> Lỗi đọc file PDF</span>`;
-                document.getElementById('cv-text').value = "Không thể đọc tự động. Vui lòng copy và dán nội dung chữ của CV vào đây.";
+            for(let i=0; i<files.length; i++) {
+                pendingFiles.push(files[i]);
             }
+            renderPendingFiles();
         }
 
-        // HÀM ĐÁNH GIÁ TỰ ĐỘNG DÒ TÌM MODEL THÔNG MINH (CHỐNG LỖI MẤT KẾT NỐI)
-        async function evaluateWithGemini() {
+        function renderPendingFiles() {
+            const list = document.getElementById('pending-files-list');
+            list.innerHTML = '';
+            document.getElementById('pending-count').innerText = pendingFiles.length;
+            
+            if (pendingFiles.length > 0) {
+                document.getElementById('pending-files-container').classList.remove('hidden');
+                document.getElementById('btn-evaluate-batch').disabled = false;
+                document.getElementById('btn-evaluate-batch').classList.replace('bg-gray-400', 'bg-purple-600');
+            } else {
+                document.getElementById('pending-files-container').classList.add('hidden');
+                document.getElementById('btn-evaluate-batch').disabled = true;
+                document.getElementById('btn-evaluate-batch').classList.replace('bg-purple-600', 'bg-gray-400');
+            }
+
+            pendingFiles.forEach((f, idx) => {
+                const li = document.createElement('li');
+                li.className = "px-3 py-2 flex justify-between items-center text-gray-700";
+                li.innerHTML = `<span><i class="far fa-file-pdf text-red-400 mr-2"></i> ${f.name}</span>
+                                <button onclick="removeFile(${idx})" class="text-red-400 hover:text-red-600"><i class="fas fa-times"></i></button>`;
+                list.appendChild(li);
+            });
+        }
+
+        function removeFile(idx) {
+            pendingFiles.splice(idx, 1);
+            renderPendingFiles();
+        }
+
+        function clearBatch() {
+            pendingFiles = [];
+            document.getElementById('cv-upload-batch').value = "";
+            renderPendingFiles();
+        }
+
+        // Hàm tiện ích bóc chữ PDF trả về Promise
+        async function readPdfText(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+            let text = '';
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const content = await page.getTextContent();
+                text += content.items.map(item => item.str).join(' ') + '\n';
+            }
+            return text;
+        }
+
+        async function startBatchEvaluation() {
             const apiKey = document.getElementById('api-key-input').value.trim();
             if (!apiKey) {
-                alert("Vui lòng nhập và Lưu Gemini API Key ở khung màu vàng phía trên trước!");
-                return;
+                alert("Vui lòng nhập và Lưu Gemini API Key trước!"); return;
             }
 
             const selectedJob = document.getElementById('candidate-job-select').value;
-            const jobCriteria = currentCriteria[selectedJob];
-            const cvText = document.getElementById('cv-text').value;
+            const jobCriteria = customJDs[selectedJob];
+            if (!jobCriteria) { alert("Vui lòng chọn hoặc tạo JD trước!"); return; }
 
-            if (!cvText || cvText.trim() === "" || cvText.includes("Đang trích xuất")) {
-                alert("Vui lòng tải file CV (PDF) hoặc dán văn bản CV của ứng viên vào ô bên dưới!");
-                return;
+            const btn = document.getElementById('btn-evaluate-batch');
+            btn.innerHTML = '<i class="fas fa-spinner spinner mr-2"></i> Hệ thống đang chạy tự động...';
+            btn.disabled = true;
+            
+            const progressContainer = document.getElementById('batch-progress-container');
+            const progressBar = document.getElementById('batch-progress-bar');
+            const progressText = document.getElementById('batch-progress-text');
+            const progressPercent = document.getElementById('batch-progress-percent');
+            progressContainer.classList.remove('hidden');
+
+            const total = pendingFiles.length;
+            evaluatedCandidates = []; // Reset dữ liệu cũ để hiển thị lô mới nhất
+
+            for (let i = 0; i < total; i++) {
+                const currentFile = pendingFiles[i];
+                
+                // Update UI Progress
+                let percent = Math.round((i / total) * 100);
+                progressBar.style.width = percent + '%';
+                progressText.innerText = `Đang xử lý (${i+1}/${total}): ${currentFile.name}...`;
+                progressPercent.innerText = percent + '%';
+
+                try {
+                    // 1. Đọc Text từ PDF
+                    const cvText = await readPdfText(currentFile);
+                    
+                    // 2. Gọi AI
+                    const aiResult = await callGeminiAI(apiKey, selectedJob, jobCriteria, cvText);
+                    
+                    // 3. Phân tích kết quả JSON trả về từ AI
+                    let score = "N/A", status = "Chưa đánh giá", htmlReport = "<p>Lỗi tạo báo cáo.</p>";
+                    try {
+                        const parsedData = JSON.parse(aiResult);
+                        score = parsedData.score || "N/A";
+                        status = parsedData.status || "N/A";
+                        htmlReport = parsedData.htmlReport || "";
+                    } catch(err) {
+                        // Fallback nếu AI lỡ sinh lỗi JSON
+                        console.warn("Lỗi parse JSON từ AI, sử dụng mã raw HTML.", err);
+                        htmlReport = aiResult; 
+                    }
+
+                    // 4. Đẩy vào Database nội bộ
+                    evaluatedCandidates.push({
+                        name: currentFile.name.replace('.pdf', ''),
+                        fileName: currentFile.name,
+                        score: score,
+                        status: status,
+                        htmlReport: htmlReport
+                    });
+
+                } catch(error) {
+                    console.error("Lỗi khi xử lý file " + currentFile.name, error);
+                    evaluatedCandidates.push({
+                        name: currentFile.name,
+                        fileName: currentFile.name,
+                        score: "Error",
+                        status: "Lỗi kết nối AI",
+                        htmlReport: `<div class="p-6 bg-red-50 text-red-600">Có lỗi xảy ra: ${error.message}</div>`
+                    });
+                }
             }
 
-            const btn = document.getElementById('btn-evaluate');
-            const resultDiv = document.getElementById('ai-results');
+            // Hoàn tất lô
+            progressBar.style.width = '100%';
+            progressText.innerText = `Đã hoàn tất phân tích ${total} hồ sơ!`;
+            progressPercent.innerText = '100%';
+            btn.innerHTML = '<i class="fas fa-check mr-2"></i> Phân tích xong. Tự động chuyển Tab...';
+            
+            setTimeout(() => {
+                clearBatch();
+                progressContainer.classList.add('hidden');
+                btn.innerHTML = '<i class="fas fa-robot mr-2"></i> Bắt đầu Quét Đánh Giá Lô';
+                switchTab('dashboard-tab'); // Tự chuyển sang tab dashboard
+            }, 1500);
+        }
 
-            btn.innerHTML = '<i class="fas fa-spinner spinner mr-2"></i> Gemini AI đang phân tích hồ sơ... (Khoảng 10-15 giây)';
-            btn.classList.replace('bg-purple-600', 'bg-gray-500');
-            btn.disabled = true;
-
+        // --- TÍCH HỢP GEMINI AI (JSON MODE) ---
+        async function callGeminiAI(apiKey, jobTitle, jdObject, cvText) {
             const prompt = `
-Bạn là một chuyên gia tuyển dụng cấp cao. Nhiệm vụ của bạn là thực hiện toàn bộ quy trình: Phân tích CV, đánh giá, tính điểm, và tạo ra báo cáo HTML.
+Bạn là chuyên gia tuyển dụng. Nhiệm vụ của bạn là đối chiếu CV với JD, chấm điểm và tạo HTML report.
 
-VỊ TRÍ ỨNG TUYỂN: ${selectedJob}
-
-CƠ SỞ DỮ LIỆU TIÊU CHÍ TUYỂN DỤNG (JD):
-${JSON.stringify(jobCriteria, null, 2)}
+VỊ TRÍ TUYỂN DỤNG: ${jobTitle}
+TIÊU CHÍ (JD):
+${JSON.stringify(jdObject)}
 
 NỘI DUNG CV CỦA ỨNG VIÊN:
 ${cvText}
 
-YÊU CẦU ĐỊNH DẠNG ĐẦU RA (BẮT BUỘC TRẢ VỀ MÃ HTML THUẦN TÚY CÓ TRANG TRÍ ĐẦY ĐỦ, TUYỆT ĐỐI KHÔNG DÙNG MARKDOWN, KHÔNG BỌC TRONG \`\`\`html):
+CHỈ THỊ CỰC KỲ QUAN TRỌNG: 
+Bạn BẮT BUỘC phải trả về dữ liệu đúng chuẩn định dạng JSON hợp lệ (không chứa markdown \`\`\`json ở đầu cuối). Cấu trúc JSON bắt buộc phải chính xác như sau:
+{
+  "score": "Điểm từ 1-10 (ví dụ: 8.5)",
+  "status": "Đạt / Không đạt / Cân nhắc",
+  "htmlReport": "TOÀN BỘ MÃ HTML CỦA BÁO CÁO NHƯ YÊU CẦU DƯỚI ĐÂY"
+}
 
-PHẦN I: BÁO CÁO ĐÁNH GIÁ ỨNG VIÊN
-Yêu cầu sử dụng đúng các style inline sau:
-<div class="report-section mb-10 bg-white p-6 rounded-lg border border-gray-200">
-    <h1 class="text-2xl font-bold text-gray-700 mb-6 border-b pb-2">BÁO CÁO ĐÁNH GIÁ HỒ SƠ ỨNG VIÊN</h1>
-    <h2 style="font-size: 1.25rem; font-weight: 600; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem;">1. Tổng quan</h2>
-    <p><strong>Điểm trung bình:</strong> [Điểm TB]</p>
-    <p><strong>Kết quả:</strong> [Đạt / Không đạt / Cân nhắc]</p>
-
-    <h2 style="font-size: 1.25rem; font-weight: 600; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem; margin-top: 1.5rem;">2. Phân tích chi tiết</h2>
-    <ul style="list-style: none; padding: 0;">
-        <li style="margin-bottom: 1.25rem;">
-            <strong>[Tên Tiêu chí] (Điểm: X/10)</strong>
-            <ul style="list-style-type: none; padding-left: 1.25rem; margin-top: 0.5rem;">
-                <li style="margin-bottom: 0.25rem;"><strong style="color: #4b5563;">Yêu cầu:</strong> [Sao chép nguyên văn yêu cầu từ JD]</li>
-                <li style="margin-bottom: 0.25rem;"><strong style="color: #4b5563;">Thông tin ứng viên:</strong> [Trích xuất từ CV]</li>
-                <li style="margin-bottom: 0.25rem;"><strong style="color: #4b5563;">Nhận xét:</strong> [Nhận xét chi tiết]</li>
-            </ul>
-        </li>
-    </ul>
-
-    <h2 style="font-size: 1.25rem; font-weight: 600; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem; margin-top: 1.5rem;">3. Đánh giá sự phù hợp về kinh nghiệm với mô tả công việc</h2>
-    <p>[Phân tích sâu...]</p>
-
-    <h2 style="font-size: 1.25rem; font-weight: 600; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem; margin-top: 1.5rem;">4. Điểm mạnh</h2>
-    <p>[Liệt kê điểm mạnh...]</p>
-
-    <h2 style="font-size: 1.25rem; font-weight: 600; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem; margin-top: 1.5rem;">5. Điểm cần cải thiện</h2>
-    <p>[Liệt kê điểm yếu...]</p>
-
-    <h2 style="font-size: 1.25rem; font-weight: 600; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem; margin-top: 1.5rem;">6. Kết luận và Đề xuất</h2>
-    <p>[Kết luận...]</p>
-
-    <h2 style="font-size: 1.25rem; font-weight: 600; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem; margin-top: 1.5rem;">7. Phụ lục</h2>
-    <h3 style="font-size: 1.1rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem;">7.1. Tóm tắt quá trình công tác</h3>
-    <p>[Trích xuất CV...]</p>
-    <h3 style="font-size: 1.1rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem;">7.2. Học vấn (Bằng cấp, chứng chỉ)</h3>
-    <p>[Trích xuất CV...]</p>
-</div>
-
-PHẦN II: BỘ CÂU HỎI PHỎNG VẤN GỢI Ý (BẮT BUỘC TỐI THIỂU 5 CÂU HỎI):
-<div class="questions-section bg-white p-6 rounded-lg border border-gray-200">
-    <h1 class="text-2xl font-bold mb-6 border-b pb-2 text-gray-700">BỘ CÂU HỎI PHỎNG VẤN GỢI Ý</h1>
-    <h3 style="font-size: 1.1rem; font-weight: 600; margin-top: 1rem; margin-bottom: 1rem;">Câu hỏi Hành vi/Kỹ thuật/Tình huống</h3>
-    
-    <div class="p-4 mb-6 border border-gray-200 rounded-lg">
-        <p class="mb-2"><strong class="text-blue-600">Câu hỏi X:</strong> [Nội dung câu hỏi]</p>
-        <div class="bg-green-50 p-3 rounded-md mb-2">
-            <strong class="text-green-700">Gợi ý Trả lời:</strong> [Các điểm chính...]
-        </div>
-        <div class="bg-yellow-50 p-3 rounded-md">
-            <strong class="text-yellow-700">Thang điểm (1-10):</strong> [Gợi ý chấm điểm...]
-        </div>
-    </div>
-</div>
+YÊU CẦU VIẾT MÃ HTML (Dùng vào key "htmlReport" của chuỗi JSON):
+Báo cáo HTML gồm 2 phần, sử dụng Tailwind hoặc inline style CSS cho đẹp mắt.
+PHẦN I: BÁO CÁO PHÂN TÍCH (Giống các tiêu chuẩn chấm điểm thông thường, đánh giá điểm mạnh yếu, so sánh CV và JD).
+PHẦN II: CÂU HỎI PHỎNG VẤN CHUYÊN SÂU (Từ 5 - 10 câu hỏi)
+   - BẮT BUỘC: Hỏi xoáy sâu vào các dự án/công nghệ ứng viên có ghi trong CV.
+   - Kiểm tra kiến thức chuyên ngành liên quan đến Vị trí ứng tuyển (JD).
+   - Đưa ra các tình huống thực tế khó để thử thách ứng viên.
+   - Cung cấp 'Gợi ý câu trả lời kỳ vọng' và 'Thang điểm (1-10)' cho mỗi câu.
+Đảm bảo mã HTML sử dụng dấu nháy đơn (') cho các thuộc tính class/style để tránh làm hỏng cấu trúc JSON bao ngoài.
 `;
 
-            // DANH SÁCH CÁC MODEL DỰ PHÒNG (TỰ ĐỘNG THỬ LẦN LƯỢT ĐỂ TRÁNH LỖI NOT FOUND)
-            const modelsToTry = [
-                "gemini-3.6-flash",
-                "gemini-2.5-flash",
-                "gemini-2.0-flash",
-                "gemini-1.5-flash"
-            ];
+            const modelsToTry = ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-2.5-flash"];
+            for (let modelName of modelsToTry) {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }],
+                            generationConfig: { 
+                                temperature: 0.2,
+                                responseMimeType: "application/json" // Ép mô hình trả về chuẩn JSON
+                            }
+                        })
+                    });
 
-            let success = false;
-            let data = null;
-
-            try {
-                for (let modelName of modelsToTry) {
-                    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-                    
-                    try {
-                        const response = await fetch(url, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                contents: [{ parts: [{ text: prompt }] }],
-                                generationConfig: { temperature: 0.2 }
-                            })
-                        });
-
-                        const resJson = await response.json();
-                        if (!resJson.error) {
-                            data = resJson;
-                            success = true;
-                            break; // Thoát vòng lặp khi gọi thành công model đầu tiên phản hồi tốt
-                        }
-                    } catch (innerErr) {
-                        console.warn(`Model ${modelName} lỗi, đang thử model tiếp theo...`);
+                    const resJson = await response.json();
+                    if (!resJson.error) {
+                        return resJson.candidates[0].content.parts[0].text;
                     }
+                } catch (e) {
+                    console.warn(`Model ${modelName} lỗi, thử model dự phòng...`);
                 }
-
-                if (!success || !data) {
-                    throw new Error("Tất cả các phiên bản model đều không phản hồi. Vui lòng kiểm tra lại quyền của API Key.");
-                }
-
-                let htmlContent = data.candidates[0].content.parts[0].text;
-                // Làm sạch thẻ đánh dấu markdown nếu AI lỡ bọc vào
-                htmlContent = htmlContent.replace(/```html/g, '').replace(/```/g, '').trim();
-
-                resultDiv.innerHTML = htmlContent;
-                resultDiv.classList.remove('hidden');
-                document.getElementById('export-btns').classList.remove('hidden');
-                document.getElementById('export-btns').classList.add('flex');
-
-                btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Đánh giá Hoàn tất!';
-                btn.classList.replace('bg-gray-500', 'bg-green-600');
-
-            } catch (error) {
-                console.error(error);
-                alert("Hệ thống báo lỗi kết nối AI:\n" + error.message);
-                btn.innerHTML = '<i class="fas fa-magic mr-2"></i> Thử Đánh giá lại';
-                btn.classList.replace('bg-gray-500', 'bg-purple-600');
-            } finally {
-                btn.disabled = false;
             }
+            throw new Error("Tất cả mô hình AI đều từ chối kết nối. Kiểm tra lại API Key.");
         }
+
+        // --- DASHBOARD RENDER ---
+        function renderDashboardDropdown() {
+            const dd = document.getElementById('evaluated-candidate-select');
+            dd.innerHTML = '';
+            
+            if (evaluatedCandidates.length === 0) {
+                document.getElementById('empty-dashboard').classList.remove('hidden');
+                document.getElementById('data-dashboard').classList.add('hidden');
+                return;
+            }
+
+            document.getElementById('empty-dashboard').classList.add('hidden');
+            document.getElementById('data-dashboard').classList.remove('hidden');
+
+            evaluatedCandidates.forEach((cand, idx) => {
+                const opt = document.createElement('option');
+                opt.value = idx;
+                opt.textContent = `${cand.name} - Điểm: ${cand.score} - ${cand.status}`;
+                dd.appendChild(opt);
+            });
+
+            // Tự động hiển thị người đầu tiên
+            displayCandidateReport();
+        }
+
+        function displayCandidateReport() {
+            const idx = document.getElementById('evaluated-candidate-select').value;
+            if (idx === "" || !evaluatedCandidates[idx]) return;
+
+            const cand = evaluatedCandidates[idx];
+            document.getElementById('dashboard-score').innerText = cand.score;
+            
+            const statusEl = document.getElementById('dashboard-status');
+            statusEl.innerText = cand.status;
+            // Màu sắc trạng thái
+            if(cand.status.toLowerCase().includes('không')) statusEl.className = "text-2xl font-black text-red-600 mt-1";
+            else if(cand.status.toLowerCase().includes('cân nhắc')) statusEl.className = "text-2xl font-black text-yellow-600 mt-1";
+            else statusEl.className = "text-2xl font-black text-emerald-600 mt-1";
+
+            document.getElementById('dashboard-html-report').innerHTML = cand.htmlReport;
+        }
+
     </script>
 </body>
 </html>
