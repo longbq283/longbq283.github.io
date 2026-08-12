@@ -135,10 +135,10 @@
             <div id="data-dashboard" class="hidden">
                 <!-- KHUNG 1: BẢNG DANH SÁCH (TABLE VIEW) -->
                 <div id="summary-table-view">
-                    <div class="flex justify-between items-center mb-6 border-b pb-4 no-print">
+                    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 border-b pb-4 no-print gap-4">
                         <h2 class="text-xl font-bold text-gray-700">Danh sách Ứng viên đã đánh giá</h2>
-                        <button onclick="exportBatchToHTML()" class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2 rounded-md font-semibold transition whitespace-nowrap shadow-sm text-sm">
-                            <i class="fas fa-file-code mr-1"></i> Xuất Lô HTML
+                        <button onclick="exportBatchToHTML()" class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-md font-semibold transition whitespace-nowrap shadow-sm text-sm">
+                            <i class="fas fa-file-code mr-1"></i> Xuất Báo Cáo Lô (HTML)
                         </button>
                     </div>
 
@@ -146,10 +146,10 @@
                         <table class="min-w-full leading-normal">
                             <thead>
                                 <tr>
-                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tên Ứng Viên</th>
-                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Điểm AI</th>
-                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Trạng Thái</th>
-                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Thao tác</th>
+                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Tên Ứng Viên</th>
+                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Điểm Đánh Giá</th>
+                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Kết Quả</th>
+                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody id="summary-tbody">
@@ -161,17 +161,17 @@
 
                 <!-- KHUNG 2: CHI TIẾT 1 ỨNG VIÊN (DETAIL VIEW) -->
                 <div id="detail-report-view" class="hidden">
-                    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 border-b pb-4 no-print bg-gray-50 p-4 rounded-lg">
-                        <button onclick="backToTable()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2 rounded-md font-semibold transition whitespace-nowrap text-sm">
-                            <i class="fas fa-arrow-left mr-2"></i>Quay lại danh sách
+                    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 border-b pb-4 no-print bg-blue-50 p-4 rounded-lg">
+                        <button onclick="backToTable()" class="bg-white border border-gray-300 hover:bg-gray-100 text-gray-800 px-5 py-2.5 rounded-md font-bold transition whitespace-nowrap text-sm shadow-sm">
+                            <i class="fas fa-arrow-left mr-2"></i>Quay lại bảng
                         </button>
                         <h2 class="text-lg font-bold text-blue-700 truncate max-w-md" id="detail-cand-name">Tên ứng viên</h2>
-                        <button onclick="window.print()" class="bg-gray-800 hover:bg-gray-900 text-white px-5 py-2 rounded-md font-semibold transition whitespace-nowrap text-sm shadow-sm">
-                            <i class="fas fa-print mr-1"></i> In / Xuất PDF
+                        <button onclick="window.print()" class="bg-gray-800 hover:bg-gray-900 text-white px-5 py-2.5 rounded-md font-bold transition whitespace-nowrap text-sm shadow-sm">
+                            <i class="fas fa-file-pdf mr-1"></i> Xuất PDF
                         </button>
                     </div>
 
-                    <!-- Khu vực In -->
+                    <!-- Khu vực In Báo Cáo HTML từ AI -->
                     <div id="print-area">
                         <div class="grid grid-cols-2 gap-4 mb-6">
                             <div class="bg-indigo-50 border border-indigo-100 rounded-lg p-4 text-center">
@@ -179,12 +179,12 @@
                                 <p id="dashboard-score" class="text-3xl font-black text-indigo-700">--</p>
                             </div>
                             <div class="bg-emerald-50 border border-emerald-100 rounded-lg p-4 text-center">
-                                <p class="text-xs font-bold text-emerald-500 uppercase tracking-wider mb-1">Đề xuất Trạng Thái</p>
+                                <p class="text-xs font-bold text-emerald-500 uppercase tracking-wider mb-1">Kết Luận</p>
                                 <p id="dashboard-status" class="text-2xl font-black text-emerald-700 mt-1">--</p>
                             </div>
                         </div>
                         
-                        <div id="dashboard-html-report" class="prose max-w-none w-full">
+                        <div id="dashboard-html-report" class="prose max-w-none w-full text-gray-800 leading-relaxed">
                             <!-- AI HTML here -->
                         </div>
                     </div>
@@ -263,7 +263,7 @@
     </div>
 
     <script>
-        // BỘ DỮ LIỆU CƠ SỞ (Đã chuẩn hóa)
+        // BỘ DỮ LIỆU CƠ SỞ (Đã chuẩn hóa 9 vị trí gốc)
         const defaultCriteria = {
             "Chuyên viên phân tích nghiệp vụ và kiểm soát chất lượng BA/QC (cấp 1 đến cấp 4) - Nội bộ kết hợp ngoài hệ thống": {
                 "Mô tả công việc": "1. Công tác Phân tích nghiệp vụ (BA): Thực hiện thu thập và phân tích yêu cầu nghiệp vụ liên quan đến hệ thống Core Banking và các hệ thống vệ tinh; tham gia xây dựng tài liệu nghiệp vụ URD (User Requirement Document), RSD (Requirement Specification Document) theo quy định của BIDV. Tư vấn các giải pháp phát triển mới, nâng cấp và tư vấn thiết kế chức năng hệ thống Core Banking, hệ thống khác có liên quan phù hợp. Hỗ trợ kết nối các vấn đề cơ bản giữa các bên nghiệp vụ, kỹ thuật và phát triển phần mềm, truyền tải yêu cầu nghiệp vụ thành các thông số kỹ thuật, chức năng và ràng buộc có thể triển khai. Phân tích yêu cầu, tham số hệ thống để đề xuất khai báo, cấu hình hoặc cập nhật. 2. Công tác kiểm soát chất lượng (QC): Quản lý danh mục yêu cầu và kế hoạch triển khai hệ thống Core Banking theo từng giai đoạn, phiên bản. Xây dựng kịch bản kiểm thử hoặc kiểm thử theo kịch bản có sẵn trên các môi trường SIT (System Integration Test), UAT (User Acceptance Test) cho các yêu cầu chức năng và tham số, phối hợp các kiểm thử hạ tầng, hiệu năng và các thành phần tích hợp. Chuẩn bị hồ sơ đánh giá an toàn thông tin đối với các tính năng mới hoặc thay đổi hệ thống, đảm bảo các sản phẩm và thay đổi được triển khai tuân thủ quy định bảo mật và tiêu chuẩn chất lượng. 3. Công tác Đào tạo, hỗ trợ và xây dựng văn bản chế độ: Xây dựng, cập nhật các văn bản, quy trình nghiệp vụ liên quan đến hệ thống Core Banking. Đào tạo, chuyển giao kiến thức hệ thống Core Banking cho các cán bộ trong toàn hệ thống khi có yêu cầu; hỗ trợ xử lý các tình huống phát sinh mới trong nghiệp vụ. 4. Tham gia các tổ, nhóm đề tài, dự án và thực hiện các nhiệm vụ khác theo phân công của Lãnh đạo Ban.",
@@ -365,7 +365,6 @@
             }
         }
 
-        // --- QUẢN LÝ JD ---
         function loadJDsFromStorage() {
             const stored = localStorage.getItem('app_custom_jds');
             if (stored) {
@@ -555,7 +554,6 @@
             throw new Error(lastError || "AI không thể phản hồi bóc tách JD.");
         }
 
-
         // --- QUẢN LÝ LÔ (BATCH UPLOAD) & API KEY ---
         function saveApiKey() {
             const key = document.getElementById('api-key-input').value.trim();
@@ -684,7 +682,7 @@
                         if (valid.length > 0) return valid;
                     }
                 } catch(e) {
-                    console.warn("API trả về HTML khi get models (Có thể do lỗi chặn CORS). Sẽ sử dụng list fallback.");
+                    console.warn("API trả về HTML khi get models. Sẽ sử dụng list fallback.");
                 }
             } catch (e) {
                 console.warn("Không lấy được danh sách models:", e);
@@ -695,8 +693,8 @@
         // --- GỌI AI ĐÁNH GIÁ TỪNG ỨNG VIÊN ---
         async function callGeminiAI(apiKey, jobTitle, jdObject, cvText, validModels) {
             const prompt = `
-Bạn là Giám đốc Nhân sự (CHRO).
-BẮT BUỘC: Bạn phải so sánh nội dung CV trực tiếp với TỪNG TIÊU CHÍ TRONG JD DƯỚI ĐÂY để cho điểm. Không được đánh giá chung chung!
+Bạn là Giám đốc Nhân sự (CHRO) và Chuyên gia phỏng vấn kỹ thuật cấp cao.
+Yêu cầu: So sánh CỰC KỲ CHI TIẾT VÀ KHẮT KHE nội dung CV của ứng viên với TỪNG TIÊU CHÍ trong JD. Không được đánh giá chung chung.
 
 VỊ TRÍ TUYỂN DỤNG: ${jobTitle}
 CHI TIẾT TIÊU CHÍ (JD):
@@ -710,27 +708,30 @@ CHI TIẾT TIÊU CHÍ (JD):
 NỘI DUNG CV ỨNG VIÊN:
 ${cvText}
 
-BẮT BUỘC TRẢ VỀ DỮ LIỆU ĐỊNH DẠNG JSON HOÀN CHỈNH NHƯ SAU (KHÔNG BỌC TRONG \`\`\`json):
+BẮT BUỘC TRẢ VỀ JSON HỢP LỆ (KHÔNG bọc Markdown \`\`\`json):
 {
   "score": "Điểm tổng quan từ 1-10 (ví dụ: 8.5)",
-  "status": "Đạt hoặc Không đạt hoặc Cân nhắc",
-  "htmlReport": "<div class='report-section'>...TOÀN BỘ MÃ HTML BÁO CÁO PHẦN I VÀ PHẦN II...</div>"
+  "status": "Chỉ được chọn 1 trong 2: Đạt hoặc Không đạt", 
+  "htmlReport": "<div class='report-section'>...MÃ HTML BÁO CÁO...</div>"
 }
 
-NỘI DUNG HTML TRONG 'htmlReport':
-PHẦN I: BÁO CÁO PHÂN TÍCH TỪNG TIÊU CHÍ SO VỚI JD (Nêu rõ ứng viên có/không có gì).
-PHẦN II: BỘ CÂU HỎI PHỎNG VẤN CHUYÊN SÂU (TỪ 5 ĐẾN 10 CÂU HỎI).
-Dựa trên những kinh nghiệm/công nghệ/dự án ứng viên viết trong CV, hãy đặt câu hỏi xoáy sâu kiểm tra nghiệp vụ thực tế.
-Mỗi câu hỏi phải đi kèm 'Gợi ý đáp án kỳ vọng' và 'Thang điểm (1-10)'.
+YÊU CẦU NỘI DUNG 'htmlReport':
+PHẦN I: ĐÁNH GIÁ CHI TIẾT TỪNG TIÊU CHÍ (So sánh tỉ mỉ JD và CV)
+Liệt kê rõ ràng TỪNG tiêu chí (Độ tuổi, Chuyên môn, Ngoại ngữ, Kinh nghiệm...). Phân tích sâu: Ứng viên có gì? JD yêu cầu gì? Ứng viên thiếu hụt hay đáp ứng xuất sắc? Chấm điểm cho từng tiêu chí nhỏ. Đưa ra lập luận rõ ràng.
 
-Trang trí bằng thẻ HTML (<h2>, <ul>...) và Tailwind CSS (ví dụ class='font-bold text-gray-800'). Dùng dấu nháy đơn (') cho thuộc tính class.
+PHẦN II: 10 CÂU HỎI PHỎNG VẤN CHUYÊN SÂU
+Chia làm 2 nhóm rõ ràng:
+- Nhóm 1: 5 Câu hỏi cơ bản (Dễ) - Xác minh thông tin, kiến thức nền tảng dự án dựa trên CV.
+- Nhóm 2: 5 Câu hỏi tình huống/chuyên sâu (Khó) - Xoáy sâu vào các công nghệ, dự án phức tạp ứng viên đã làm. Đặt tình huống rủi ro thực tế bám sát JD để thử thách tư duy.
+*Mỗi câu hỏi phải đi kèm 'Gợi ý đáp án kỳ vọng' và 'Thang điểm (1-10)'.
+
+Sử dụng các thẻ HTML (<h2>, <h3>, <ul>, <li>, <p>) và Tailwind CSS (ví dụ: class='text-lg font-bold text-blue-700 mb-2') để trang trí thật đẹp mắt. Dùng dấu nháy đơn (') cho thuộc tính HTML.
 `;
 
             let lastError = null;
 
-            // Chạy thử lần lượt các model hợp lệ
             for (let modelName of validModels) {
-                // TRUYỀN KEY TRỰC TIẾP TRÊN URL ĐỂ TRÁNH LỖI HTML (CORS PREFLIGHT)
+                // TRUYỀN KEY TRỰC TIẾP TRÊN URL
                 let url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
                 try {
@@ -794,7 +795,6 @@ Trang trí bằng thẻ HTML (<h2>, <ul>...) và Tailwind CSS (ví dụ class='f
             const total = pendingFiles.length;
             evaluatedCandidates = []; 
 
-            // Lấy danh sách Models hợp lệ ĐÚNG CHO TÀI KHOẢN CỦA BẠN
             const validModelsList = await getValidModelsList(apiKey);
             console.log("Danh sách Model sẽ dùng để chạy:", validModelsList);
 
@@ -877,6 +877,7 @@ Trang trí bằng thẻ HTML (<h2>, <ul>...) và Tailwind CSS (ví dụ class='f
             document.getElementById('empty-dashboard').classList.add('hidden');
             document.getElementById('data-dashboard').classList.remove('hidden');
             
+            // Hiển thị khung Table, Ẩn khung Detail
             document.getElementById('summary-table-view').classList.remove('hidden');
             document.getElementById('detail-report-view').classList.add('hidden');
 
@@ -896,8 +897,6 @@ Trang trí bằng thẻ HTML (<h2>, <ul>...) và Tailwind CSS (ví dụ class='f
                 tdStatus.className = "px-5 py-4 text-sm text-center font-bold";
                 if(cand.status.toLowerCase().includes('không') || cand.status.toLowerCase().includes('thất bại') || cand.status.toLowerCase().includes('lỗi')) {
                     tdStatus.innerHTML = `<span class="bg-red-100 text-red-700 px-3 py-1 rounded-full">${cand.status}</span>`;
-                } else if(cand.status.toLowerCase().includes('cân nhắc')) {
-                    tdStatus.innerHTML = `<span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full">${cand.status}</span>`;
                 } else {
                     tdStatus.innerHTML = `<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full">${cand.status}</span>`;
                 }
@@ -905,8 +904,8 @@ Trang trí bằng thẻ HTML (<h2>, <ul>...) và Tailwind CSS (ví dụ class='f
                 const tdAction = document.createElement('td');
                 tdAction.className = "px-5 py-4 text-sm text-center";
                 tdAction.innerHTML = `
-                    <button onclick="viewCandidateDetail(${idx})" class="text-blue-600 hover:text-blue-800 transition bg-blue-100 hover:bg-blue-200 w-8 h-8 rounded-full shadow-sm" title="Xem chi tiết">
-                        <i class="fas fa-eye"></i>
+                    <button onclick="viewCandidateDetail(${idx})" class="text-blue-600 hover:text-blue-800 transition bg-blue-100 hover:bg-blue-200 px-3 py-1.5 rounded-md shadow-sm font-semibold" title="Đánh giá chi tiết">
+                        <i class="fas fa-eye mr-1"></i> Đánh giá chi tiết
                     </button>
                 `;
 
@@ -1007,7 +1006,7 @@ Trang trí bằng thẻ HTML (<h2>, <ul>...) và Tailwind CSS (ví dụ class='f
             data.forEach((c, i) => {
                 let opt = document.createElement('option');
                 opt.value = i;
-                opt.textContent = \`[\${c.score} Điểm] - \${c.name} - \${c.status}\`;
+                opt.textContent = \`[\${c.score} Điểm] - \${c.name}\`;
                 select.appendChild(opt);
             });
             showReport();
