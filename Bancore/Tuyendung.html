@@ -652,16 +652,12 @@
                 return text;
             }
             else if (ext === 'doc') {
-                // HACK: Vét cạn chữ (Raw Text Extraction) cho file Word cổ .doc trên Client-side
                 const arrayBuffer = await file.arrayBuffer();
                 const decoder = new TextDecoder('utf-8', {fatal: false});
                 let rawText = decoder.decode(arrayBuffer);
-                
-                // Lọc bỏ rác nhị phân, chỉ giữ lại chữ tiếng Việt, tiếng Anh, số, dấu và khoảng trắng
                 let cleanText = rawText.replace(/[^\p{L}\p{N}\p{P}\p{Z}\n]/gu, ' ').replace(/\s+/g, ' ').trim();
                 
                 if (cleanText.length < 50) {
-                    // Cố gắng giải mã luồng UTF-16LE nếu file lưu chuẩn cũ
                     const decoder16 = new TextDecoder('utf-16le', {fatal: false});
                     let rawText16 = decoder16.decode(arrayBuffer);
                     cleanText = rawText16.replace(/[^\p{L}\p{N}\p{P}\p{Z}\n]/gu, ' ').replace(/\s+/g, ' ').trim();
@@ -708,10 +704,10 @@
         }
 
         // --- GỌI AI ĐÁNH GIÁ TỪNG ỨNG VIÊN ---
-        async function callGeminiAI(apiKey, jobTitle, jdObject, cvText, validModels) {
+        async function callGeminiAI(apiKey, jobTitle, jdObject, cvText, validModels, candidateName) {
             const prompt = `
 Bạn là Giám đốc Nhân sự (CHRO) và Chuyên gia phỏng vấn kỹ thuật cấp cao.
-Yêu cầu: So sánh CỰC KỲ CHI TIẾT VÀ KHẮT KHE nội dung CV của ứng viên với TỪNG TIÊU CHÍ trong JD dưới đây.
+Yêu cầu: So sánh CỰC KỲ CHI TIẾT VÀ KHẮT KHE nội dung CV của ứng viên có tên "${candidateName}" với TỪNG TIÊU CHÍ trong JD dưới đây.
 
 VỊ TRÍ TUYỂN DỤNG: ${jobTitle}
 CHI TIẾT TIÊU CHÍ (JD):
@@ -722,14 +718,15 @@ CHI TIẾT TIÊU CHÍ (JD):
 - Kinh nghiệm công tác: ${jdObject["Kinh nghiệm công tác"]}
 - Yêu cầu khác: ${jdObject["Yêu cầu khác"]}
 
-NỘI DUNG CV ỨNG VIÊN:
+NỘI DUNG CV ỨNG VIÊN (${candidateName}):
 ${cvText}
 
 BẮT BUỘC TRẢ VỀ DỮ LIỆU THEO ĐÚNG ĐỊNH DẠNG TEXT DƯỚI ĐÂY (KHÔNG SỬ DỤNG JSON ĐỂ TRÁNH LỖI FORMATTING, CHỈ CẦN DÙNG CÁC THẺ HTML NHƯ YÊU CẦU):
+<NAME>Trích xuất Họ và Tên ứng viên từ CV (nếu không thấy thì lấy tên file: ${candidateName})</NAME>
 <SCORE>Điểm trung bình cộng tổng quan từ 1 đến 10 (ví dụ: 8.5 hoặc 4.5)</SCORE>
 <REPORT>
 <div class='report-section'>
-    <h1 class='text-2xl font-bold text-gray-800 mb-6 border-b pb-2'>BÁO CÁO THẨM ĐỊNH CV CHI TIẾT</h1>
+    <h1 class='text-2xl font-bold text-gray-800 mb-6 border-b pb-2'>BÁO CÁO THẨM ĐỊNH CV: <span class="text-blue-600">[Tên Ứng Viên]</span></h1>
     
     <h2 class='text-xl font-bold text-blue-700 mb-4'><i class='fas fa-check-circle mr-2'></i> PHẦN 1: ĐÁNH GIÁ CHI TIẾT TỪNG TIÊU CHÍ SO VỚI JD</h2>
     <p class='text-sm text-gray-600 mb-4'>Dưới đây là kết quả thẩm định khắt khe cho từng hạng mục tuyển dụng:</p>
@@ -747,7 +744,7 @@ BẮT BUỘC TRẢ VỀ DỮ LIỆU THEO ĐÚNG ĐỊNH DẠNG TEXT DƯỚI ĐÂ
     <!-- Liệt kê 5 câu hỏi bám sát các dự án ứng viên đã làm, kèm Gợi ý đáp án kỳ vọng và Thang điểm 1-10 cho từng câu -->
 
     <h3 class='text-lg font-bold text-indigo-700 mt-6 mb-2'>Nhóm 2: 5 Câu hỏi chuyên sâu & Tình huống (Khó) - Thử thách tư duy</h3>
-    <!-- Liệt kê 5 câu hỏi tình huống hóc búa, xoáy sâu vào rủi ro nghiệp vụ và kỹ thuật của vị trí BA/Core Banking, kèm Gợi ý đáp án kỳ vọng và Thang điểm 1-10 cho từng câu -->
+    <!-- Liệt kê 5 câu hỏi tình huống hóc búa, xoáy sâu vào rủi ro nghiệp vụ và kỹ thuật, kèm Gợi ý đáp án kỳ vọng và Thang điểm 1-10 cho từng câu -->
 </div>
 </REPORT>
 `;
@@ -816,6 +813,7 @@ BẮT BUỘC TRẢ VỀ DỮ LIỆU THEO ĐÚNG ĐỊNH DẠNG TEXT DƯỚI ĐÂ
 
             for (let i = 0; i < total; i++) {
                 const currentFile = pendingFiles[i];
+                let baseFileName = currentFile.name.replace(/\.[^/.]+$/, "");
                 
                 let percent = Math.round((i / total) * 100);
                 progressBar.style.width = percent + '%';
@@ -824,10 +822,14 @@ BẮT BUỘC TRẢ VỀ DỮ LIỆU THEO ĐÚNG ĐỊNH DẠNG TEXT DƯỚI ĐÂ
 
                 try {
                     const cvText = await extractTextFromFile(currentFile);
-                    const aiResultText = await callGeminiAI(apiKey, selectedJob, jobCriteria, cvText, validModelsList);
+                    const aiResultText = await callGeminiAI(apiKey, selectedJob, jobCriteria, cvText, validModelsList, baseFileName);
                     
                     let score = "0";
+                    let extractedName = baseFileName;
                     let htmlReport = aiResultText;
+
+                    const nameMatch = aiResultText.match(/<NAME>([\s\S]*?)<\/NAME>/i);
+                    if (nameMatch && nameMatch[1].trim() !== "") extractedName = nameMatch[1].trim();
 
                     const scoreMatch = aiResultText.match(/<SCORE>([\s\S]*?)<\/SCORE>/i);
                     if (scoreMatch) score = scoreMatch[1].trim();
@@ -841,11 +843,11 @@ BẮT BUỘC TRẢ VỀ DỮ LIỆU THEO ĐÚNG ĐỊNH DẠNG TEXT DƯỚI ĐÂ
                     if (reportMatch) {
                         htmlReport = reportMatch[1].trim();
                     } else {
-                        htmlReport = aiResultText.replace(/<SCORE>[\s\S]*?<\/SCORE>/gi, '').trim();
+                        htmlReport = aiResultText.replace(/<SCORE>[\s\S]*?<\/SCORE>/gi, '').replace(/<NAME>[\s\S]*?<\/NAME>/gi, '').trim();
                     }
 
                     evaluatedCandidates.push({
-                        name: currentFile.name.replace(/\.[^/.]+$/, ""),
+                        name: extractedName,
                         score: numScore.toString(),
                         status: status,
                         htmlReport: htmlReport
@@ -854,7 +856,7 @@ BẮT BUỘC TRẢ VỀ DỮ LIỆU THEO ĐÚNG ĐỊNH DẠNG TEXT DƯỚI ĐÂ
                 } catch(error) {
                     console.error("Lỗi khi xử lý file " + currentFile.name, error);
                     evaluatedCandidates.push({
-                        name: currentFile.name.replace(/\.[^/.]+$/, ""),
+                        name: baseFileName,
                         score: "0",
                         status: "Lỗi",
                         htmlReport: `<div class="p-6 bg-red-50 text-red-600 rounded-lg border border-red-200">
