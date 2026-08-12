@@ -81,13 +81,13 @@
             </div>
 
             <div class="bg-blue-50 p-6 rounded-lg border border-blue-100 mb-8">
-                <label class="block text-sm font-semibold text-gray-800 mb-2">Chọn các file CV (Hỗ trợ: PDF, DOC, DOCX, XLSX):</label>
+                <label class="block text-sm font-semibold text-gray-800 mb-2">Chọn các file CV (Hỗ trợ: PDF, DOCX, DOC cũ, XLSX):</label>
                 <div class="flex items-center justify-center w-full mb-4">
                     <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-blue-400 rounded-lg cursor-pointer bg-white hover:bg-blue-50 transition">
                         <div class="flex flex-col items-center justify-center pt-4 pb-4 text-gray-500">
                             <i class="fas fa-file-upload text-3xl mb-2 text-blue-500"></i>
                             <p class="mb-1 text-sm font-semibold text-blue-700">Click để chọn nhiều file CV cùng lúc</p>
-                            <p class="text-xs text-gray-400">Hỗ trợ PDF, DOC, DOCX, EXCEL (Quét theo lô)</p>
+                            <p class="text-xs text-gray-400">Hỗ trợ PDF, DOCX, DOC, EXCEL (Quét theo lô)</p>
                         </div>
                         <input type="file" id="cv-upload-batch" class="hidden" accept=".pdf,.doc,.docx,.xls,.xlsx" multiple onchange="handleBatchFileSelect(event)" />
                     </label>
@@ -263,7 +263,6 @@
     </div>
 
     <script>
-        // BỘ DỮ LIỆU CƠ SỞ (9 vị trí)
         const defaultCriteria = {
             "Chuyên viên phân tích nghiệp vụ và kiểm soát chất lượng BA/QC (cấp 1 đến cấp 4) - Nội bộ kết hợp ngoài hệ thống": {
                 "Mô tả công việc": "1. Công tác Phân tích nghiệp vụ (BA): Thực hiện thu thập và phân tích yêu cầu nghiệp vụ liên quan đến hệ thống Core Banking và các hệ thống vệ tinh; tham gia xây dựng tài liệu nghiệp vụ URD (User Requirement Document), RSD (Requirement Specification Document) theo quy định của BIDV. Tư vấn các giải pháp phát triển mới, nâng cấp và tư vấn thiết kế chức năng hệ thống Core Banking, hệ thống khác có liên quan phù hợp. Hỗ trợ kết nối các vấn đề cơ bản giữa các bên nghiệp vụ, kỹ thuật và phát triển phần mềm, truyền tải yêu cầu nghiệp vụ thành các thông số kỹ thuật, chức năng và ràng buộc có thể triển khai. Phân tích yêu cầu, tham số hệ thống để đề xuất khai báo, cấu hình hoặc cập nhật. 2. Công tác kiểm soát chất lượng (QC): Quản lý danh mục yêu cầu và kế hoạch triển khai hệ thống Core Banking theo từng giai đoạn, phiên bản. Xây dựng kịch bản kiểm thử hoặc kiểm thử theo kịch bản có sẵn trên các môi trường SIT (System Integration Test), UAT (User Acceptance Test) cho các yêu cầu chức năng và tham số, phối hợp các kiểm thử hạ tầng, hiệu năng và các thành phần tích hợp. Chuẩn bị hồ sơ đánh giá an toàn thông tin đối với các tính năng mới hoặc thay đổi hệ thống, đảm bảo các sản phẩm và thay đổi được triển khai tuân thủ quy định bảo mật và tiêu chuẩn chất lượng. 3. Công tác Đào tạo, hỗ trợ và xây dựng văn bản chế độ: Xây dựng, cập nhật các văn bản, quy trình nghiệp vụ liên quan đến hệ thống Core Banking. Đào tạo, chuyển giao kiến thức hệ thống Core Banking cho các cán bộ trong toàn hệ thống khi có yêu cầu; hỗ trợ xử lý các tình huống phát sinh mới trong nghiệp vụ. 4. Tham gia các tổ, nhóm đề tài, dự án và thực hiện các nhiệm vụ khác theo phân công của Lãnh đạo Ban.",
@@ -475,7 +474,7 @@
 
             const apiKey = document.getElementById('api-key-input').value.trim();
             if (!apiKey) {
-                alert("Vui lòng Lưu Gemini API Key ở ô phía trên trước khi dùng AI bóc tách JD!");
+                alert("Vui lòng Lưu Gemini API Key ở ô phía trên trước khi dùng tính năng AI bóc tách JD!");
                 event.target.value = ""; return;
             }
 
@@ -627,6 +626,7 @@
 
         async function extractTextFromFile(file) {
             const ext = file.name.split('.').pop().toLowerCase();
+            
             if (ext === 'pdf') {
                 const arrayBuffer = await file.arrayBuffer();
                 const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
@@ -653,10 +653,28 @@
                 return text;
             }
             else if (ext === 'doc') {
-                throw new Error("Trình duyệt không hỗ trợ đọc file .doc cũ. Vui lòng chuyển thành .docx hoặc .pdf");
+                // HACK: Vét cạn chữ (Raw Text Extraction) cho file Word cổ .doc trên Client-side
+                const arrayBuffer = await file.arrayBuffer();
+                const decoder = new TextDecoder('utf-8', {fatal: false});
+                let rawText = decoder.decode(arrayBuffer);
+                
+                // Lọc bỏ rác nhị phân, chỉ giữ lại chữ tiếng Việt, tiếng Anh, số, dấu và khoảng trắng
+                let cleanText = rawText.replace(/[^\p{L}\p{N}\p{P}\p{Z}\n]/gu, ' ').replace(/\s+/g, ' ').trim();
+                
+                if (cleanText.length < 50) {
+                    // Cố gắng giải mã luồng UTF-16LE nếu file lưu chuẩn cũ
+                    const decoder16 = new TextDecoder('utf-16le', {fatal: false});
+                    let rawText16 = decoder16.decode(arrayBuffer);
+                    cleanText = rawText16.replace(/[^\p{L}\p{N}\p{P}\p{Z}\n]/gu, ' ').replace(/\s+/g, ' ').trim();
+                }
+                
+                if (cleanText.length < 20) {
+                     throw new Error("Không thể trích xuất chữ từ file .doc cũ này. Vui lòng Save As sang .docx hoặc .pdf");
+                }
+                return cleanText;
             }
             else {
-                throw new Error("Định dạng file không hỗ trợ.");
+                throw new Error("Định dạng file không được hỗ trợ.");
             }
         }
 
@@ -690,7 +708,7 @@
             return ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-pro"]; 
         }
 
-        // --- GỌI AI ĐÁNH GIÁ TỪNG ỨNG VIÊN (PROMPT MỚI KHẮT KHE, CHIA THANG ĐIỂM TỪNG TIÊU CHÍ VÀ 10 CÂU HỎI) ---
+        // --- GỌI AI ĐÁNH GIÁ TỪNG ỨNG VIÊN ---
         async function callGeminiAI(apiKey, jobTitle, jdObject, cvText, validModels) {
             const prompt = `
 Bạn là Giám đốc Nhân sự (CHRO) và Chuyên gia phỏng vấn kỹ thuật cấp cao.
@@ -708,7 +726,7 @@ CHI TIẾT TIÊU CHÍ (JD):
 NỘI DUNG CV ỨNG VIÊN:
 ${cvText}
 
-BẮT BUỘC TRẢ VỀ DỮ LIỆU ĐỊNH DẠNG TEXT ĐÚNG CẤU TRÚC SAU (KHÔNG DÙNG JSON, KHÔNG BỌC TRONG \`\`\`):
+BẮT BUỘC TRẢ VỀ DỮ LIỆU THEO ĐÚNG ĐỊNH DẠNG TEXT DƯỚI ĐÂY (KHÔNG SỬ DỤNG JSON ĐỂ TRÁNH LỖI FORMATTING, CHỈ CẦN DÙNG CÁC THẺ HTML NHƯ YÊU CẦU):
 <SCORE>Điểm trung bình cộng tổng quan từ 1 đến 10 (ví dụ: 8.5 hoặc 4.5)</SCORE>
 <REPORT>
 <div class='report-section'>
@@ -750,14 +768,7 @@ BẮT BUỘC TRẢ VỀ DỮ LIỆU ĐỊNH DẠNG TEXT ĐÚNG CẤU TRÚC SAU (
                         })
                     });
 
-                    const textRes = await response.text();
-                    let data;
-                    try {
-                        data = JSON.parse(textRes);
-                    } catch(e) {
-                        lastError = "Máy chủ trả về HTML thay vì dữ liệu JSON. API Key có thể bị lỗi xác thực.";
-                        continue; 
-                    }
+                    const data = await response.json();
 
                     if (data.error) {
                         lastError = data.error.message;
@@ -819,18 +830,14 @@ BẮT BUỘC TRẢ VỀ DỮ LIỆU ĐỊNH DẠNG TEXT ĐÚNG CẤU TRÚC SAU (
                     let score = "0";
                     let htmlReport = aiResultText;
 
-                    // Trích xuất Điểm từ thẻ <SCORE>
                     const scoreMatch = aiResultText.match(/<SCORE>([\s\S]*?)<\/SCORE>/i);
                     if (scoreMatch) score = scoreMatch[1].trim();
 
-                    // Chuyển điểm thành số để xét Đạt/Không đạt
                     let numScore = parseFloat(score.replace(',', '.').replace('/10', ''));
                     if (isNaN(numScore)) numScore = 0;
 
-                    // Logic: >= 5 là Đạt, < 5 là Không đạt
                     let status = (numScore >= 5) ? "Đạt" : "Không đạt";
 
-                    // Trích xuất Báo Cáo từ thẻ <REPORT>
                     const reportMatch = aiResultText.match(/<REPORT>([\s\S]*?)<\/REPORT>/i);
                     if (reportMatch) {
                         htmlReport = reportMatch[1].trim();
@@ -850,7 +857,7 @@ BẮT BUỘC TRẢ VỀ DỮ LIỆU ĐỊNH DẠNG TEXT ĐÚNG CẤU TRÚC SAU (
                     evaluatedCandidates.push({
                         name: currentFile.name.replace(/\.[^/.]+$/, ""),
                         score: "0",
-                        status: "Không đạt",
+                        status: "Lỗi",
                         htmlReport: `<div class="p-6 bg-red-50 text-red-600 rounded-lg border border-red-200">
                                         <h3 class="font-bold text-lg mb-2"><i class="fas fa-exclamation-triangle mr-2"></i>Không thể phân tích file này</h3>
                                         <p><strong>Chi tiết lỗi:</strong> ${error.message}</p>
@@ -905,8 +912,10 @@ BẮT BUỘC TRẢ VỀ DỮ LIỆU ĐỊNH DẠNG TEXT ĐÚNG CẤU TRÚC SAU (
                 tdStatus.className = "px-5 py-4 text-sm text-center font-bold";
                 if (cand.status === "Đạt") {
                     tdStatus.innerHTML = `<span class="bg-green-100 text-green-700 px-4 py-1.5 rounded-full">Đạt</span>`;
-                } else {
+                } else if (cand.status === "Không đạt") {
                     tdStatus.innerHTML = `<span class="bg-red-100 text-red-700 px-4 py-1.5 rounded-full">Không đạt</span>`;
+                } else {
+                    tdStatus.innerHTML = `<span class="bg-gray-100 text-gray-700 px-4 py-1.5 rounded-full">Lỗi</span>`;
                 }
 
                 const tdAction = document.createElement('td');
@@ -1026,10 +1035,10 @@ BẮT BUỘC TRẢ VỀ DỮ LIỆU ĐỊNH DẠNG TEXT ĐÚNG CẤU TRÚC SAU (
             
             const statusEl = document.getElementById('cand-status');
             statusEl.innerText = c.status;
-            if(c.status === "Không đạt") {
-                statusEl.className = "text-4xl font-black text-red-600 mt-2";
-            } else {
+            if(c.status === "Đạt") {
                 statusEl.className = "text-4xl font-black text-emerald-600 mt-2";
+            } else {
+                statusEl.className = "text-4xl font-black text-red-600 mt-2";
             }
 
             document.getElementById('cand-report').innerHTML = c.htmlReport;
